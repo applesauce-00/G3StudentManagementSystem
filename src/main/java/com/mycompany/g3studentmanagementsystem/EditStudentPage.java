@@ -1,14 +1,15 @@
 package com.mycompany.g3studentmanagementsystem;
 
+import StudentDataHandler.EditStudentData;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
 public class EditStudentPage extends JFrame implements ActionListener{
 
-    private JLabel lblTitle, lblStudentId, lblName, lblSection, lblGender, lblBirthDate, lblEmail, lblGrades;
-    private JTextField txtStudentId, txtName, txtSection, txtGender, txtBirthDate, txtEmail, txtGrades;
-    private JButton btnEdit, btnCancel;
+    public JLabel lblTitle, lblStudentId, lblName, lblSection, lblGender, lblBirthDate, lblEmail, lblGrades;
+    public JTextField txtStudentId, txtName, txtSection, txtGender, txtBirthDate, txtEmail, txtGrades;
+    public JButton btnEdit, btnCancel;
 
     EditStudentPage() {
         // Frame settings
@@ -108,10 +109,10 @@ public class EditStudentPage extends JFrame implements ActionListener{
         btnCancel.setBorderPainted(false);
         add(btnCancel);
 
+	EditStudentData eds = new EditStudentData(this);
 		
-		
-		btnEdit.addActionListener(this);
-		btnCancel.addActionListener(this);
+	btnEdit.addActionListener(eds);
+	btnCancel.addActionListener(eds);
     }
 	
 	
