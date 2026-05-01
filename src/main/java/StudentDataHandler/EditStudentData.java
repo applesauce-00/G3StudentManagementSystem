@@ -6,19 +6,19 @@ import javax.swing.*;
 
 public class EditStudentData implements ActionListener{
     
-    private EditStudentPage editstudent;
+    private EditStudentPage editstudents;
     
     public EditStudentData (EditStudentPage editstudent){
-        this. editstudent = editstudent;
+        this. editstudents = editstudents;
         
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == editstudent.btnEdit){
+        if (e.getSource() == editstudents.btnEdit){
 	   editButton();
     } 
-        else if (e.getSource() == editstudent.btnCancel){
+        else if (e.getSource() == editstudents.btnCancel){
            cancelButton(); 
     }
     }
@@ -26,13 +26,13 @@ public class EditStudentData implements ActionListener{
     //Edit Button Function
     private void editButton(){
         
-        String studId = editstudent.txtStudentId.getText();
-        String name = editstudent.txtName.getText();
-        String section = editstudent.txtSection.getText();
-        String gender = editstudent.txtGender.getText();
-        String birthDate = editstudent.txtBirthDate.getText();
-        String email = editstudent.txtEmail.getText();
-        String grades = editstudent.txtGrades.getText();
+        String studId = editstudents.txtStudentId.getText();
+        String name = editstudents.txtName.getText();
+        String section = editstudents.txtSection.getText();
+        String gender = editstudents.txtGender.getText();
+        String birthDate = editstudents.txtBirthDate.getText();
+        String email = editstudents.txtEmail.getText();
+        String grades = editstudents.txtGrades.getText();
         
         //Validation
         if (studId.isEmpty() || name.isEmpty() || section.isEmpty() || gender.isEmpty() || birthDate.isEmpty() || email.isEmpty() || grades.isEmpty()) {
@@ -52,20 +52,20 @@ public class EditStudentData implements ActionListener{
         int confirmMessage = JOptionPane.showConfirmDialog(null, "Are you sure want to cancel?","Confirm", JOptionPane.YES_NO_OPTION);
         
         if (confirmMessage == JOptionPane.YES_NO_OPTION){
-            editstudent.dispose();
+            editstudents.dispose();
         }
     }
     
     //Clear Input Function
     private void clearInput(){
         
-        editstudent.txtStudentId.setText("");
-        editstudent.txtName.setText("");
-        editstudent.txtSection.setText("");
-        editstudent.txtGender.setText("");
-        editstudent.txtBirthDate.setText("");
-        editstudent.txtEmail.setText("");
-        editstudent.txtGrades.setText("");
+        editstudents.txtStudentId.setText("");
+        editstudents.txtName.setText("");
+        editstudents.txtSection.setText("");
+        editstudents.txtGender.setText("");
+        editstudents.txtBirthDate.setText("");
+        editstudents.txtEmail.setText("");
+        editstudents.txtGrades.setText("");
         
     }
     
