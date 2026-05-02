@@ -110,10 +110,10 @@ public class AddStudentPage extends JFrame implements ActionListener{
         btnCancel.setBorderPainted(false);
         add(btnCancel);
 
-        AddStudentData add = new AddStudentData(this);
+        AddStudentData ads = new AddStudentData(this);
 
-        btnAdd.addActionListener(add);
-        btnCancel.addActionListener(add);
+        btnAdd.addActionListener(ads);
+        btnCancel.addActionListener(ads);
     }
 
 	@Override

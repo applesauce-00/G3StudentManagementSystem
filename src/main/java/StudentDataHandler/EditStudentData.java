@@ -8,21 +8,10 @@ public class EditStudentData implements ActionListener{
     
     private EditStudentPage editstudents;
     
-    public EditStudentData (EditStudentPage editstudent){
+    public EditStudentData (EditStudentPage editstudents){
         this. editstudents = editstudents;
         
     }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == editstudents.btnEdit){
-	   editButton();
-    } 
-        else if (e.getSource() == editstudents.btnCancel){
-           cancelButton(); 
-    }
-    }
-    
     //Edit Button Function
     private void editButton(){
         
@@ -68,5 +57,16 @@ public class EditStudentData implements ActionListener{
         editstudents.txtGrades.setText("");
         
     }
+    
+     @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == editstudents.btnEdit){
+	   editButton();
+    } 
+        else if (e.getSource() == editstudents.btnCancel){
+           cancelButton(); 
+    }
+    }
+    
     
 }

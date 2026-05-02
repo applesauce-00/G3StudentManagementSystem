@@ -109,10 +109,10 @@ public class EditStudentPage extends JFrame implements ActionListener{
         btnCancel.setBorderPainted(false);
         add(btnCancel);
 
-	EditStudentData edit = new EditStudentData(this);
+	EditStudentData eds = new EditStudentData(this);
 		
-	btnEdit.addActionListener(edit);
-	btnCancel.addActionListener(edit);
+	btnEdit.addActionListener(eds);
+	btnCancel.addActionListener(eds);
     }
 	
 	

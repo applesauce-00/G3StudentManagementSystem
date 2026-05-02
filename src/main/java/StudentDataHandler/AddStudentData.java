@@ -10,11 +10,11 @@ public class AddStudentData implements ActionListener{
     
     private AddStudentPage addstudents;
     
-    public AddStudentData(AddStudentPage addstudent){
+    public AddStudentData(AddStudentPage addstudents){
         this. addstudents = addstudents;
         
     }
-
+    
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == addstudents.btnAdd){
@@ -25,6 +25,7 @@ public class AddStudentData implements ActionListener{
     }
     
 }
+
     //Add Button Function
     private void addButton(){
         
@@ -70,5 +71,6 @@ public class AddStudentData implements ActionListener{
         addstudents.txtGrades.setText("");
         
     }
+    
 
-     }
+    }
