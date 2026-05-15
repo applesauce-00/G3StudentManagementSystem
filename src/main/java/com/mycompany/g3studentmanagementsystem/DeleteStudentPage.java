@@ -4,15 +4,15 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-public class DeleteStudentPage extends JFrame implements ActionListener{
+public class DeleteStudentPage extends JFrame implements ActionListener {
 
-    private JLabel lblTitle, lblStudentId, lblName, lblSection, lblGender, lblBirthDate, lblEmail, lblGrades;
-    private JLabel dpName, dpSection, dpGender, dpBirthDate, dpEmail, dpGrades;                //dp = for display only
-	private JTextField txtStudentId;
+    private JLabel lblTitle, lblStudentId, lblName, lblSection, lblSex, lblBirthDate, lblEmail;
+    private JLabel dpName, dpSection, dpSex, dpBirthDate, dpEmail;
+    private JTextField txtStudentId;
     private JButton btnDelete, btnCancel;
 
     DeleteStudentPage() {
-        // Frame settings
+
         setTitle("Delete Student");
         setSize(674, 924);
         setLayout(null);
@@ -20,7 +20,7 @@ public class DeleteStudentPage extends JFrame implements ActionListener{
         setLocationRelativeTo(null);
         getContentPane().setBackground(new Color(235, 242, 250));
 
-        // Title
+        // TITLE
         lblTitle = new JLabel("DELETE STUDENT");
         lblTitle.setFont(new Font("Arial", Font.BOLD, 22));
         lblTitle.setHorizontalAlignment(SwingConstants.CENTER);
@@ -32,11 +32,11 @@ public class DeleteStudentPage extends JFrame implements ActionListener{
         lblStudentId.setBounds(100, 100, 120, 25);
         add(lblStudentId);
 
-        txtStudentId = new JTextField("");
+        txtStudentId = new JTextField();
         txtStudentId.setBounds(250, 100, 200, 30);
         add(txtStudentId);
 
-        // NAME
+        // NAME (DISPLAY ONLY)
         lblName = new JLabel("NAME:");
         lblName.setBounds(100, 170, 120, 25);
         add(lblName);
@@ -54,14 +54,14 @@ public class DeleteStudentPage extends JFrame implements ActionListener{
         dpSection.setBounds(250, 240, 200, 30);
         add(dpSection);
 
-        // GENDER
-        lblGender = new JLabel("GENDER:");
-        lblGender.setBounds(100, 310, 120, 25);
-        add(lblGender);
+        // SEX
+        lblSex = new JLabel("SEX:");
+        lblSex.setBounds(100, 310, 120, 25);
+        add(lblSex);
 
-        dpGender = new JLabel("");
-        dpGender.setBounds(250, 310, 200, 30);
-        add(dpGender);
+        dpSex = new JLabel("");
+        dpSex.setBounds(250, 310, 200, 30);
+        add(dpSex);
 
         // BIRTH DATE
         lblBirthDate = new JLabel("BIRTH DATE:");
@@ -81,16 +81,7 @@ public class DeleteStudentPage extends JFrame implements ActionListener{
         dpEmail.setBounds(250, 450, 200, 30);
         add(dpEmail);
 
-        // GRADES
-        lblGrades = new JLabel("GRADES:");
-        lblGrades.setBounds(100, 520, 120, 25);
-        add(lblGrades);
-
-        dpGrades = new JLabel("");
-        dpGrades.setBounds(250, 520, 200, 30);
-        add(dpGrades);
-
-        // BUTTONS
+        // DELETE BUTTON
         btnDelete = new JButton("DELETE");
         btnDelete.setBounds(230, 650, 100, 40);
         btnDelete.setBackground(new Color(52, 168, 235));
@@ -100,6 +91,7 @@ public class DeleteStudentPage extends JFrame implements ActionListener{
         btnDelete.setBorderPainted(false);
         add(btnDelete);
 
+        // CANCEL BUTTON
         btnCancel = new JButton("CANCEL");
         btnCancel.setBounds(360, 650, 100, 40);
         btnCancel.setBackground(new Color(224, 69, 52));
@@ -108,24 +100,55 @@ public class DeleteStudentPage extends JFrame implements ActionListener{
         btnCancel.setFocusPainted(false);
         btnCancel.setBorderPainted(false);
         add(btnCancel);
-		
-		
-		btnDelete.addActionListener(this);		
-		btnCancel.addActionListener(this);
 
-        
+        btnDelete.addActionListener(this);
+        btnCancel.addActionListener(this);
     }
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() == btnDelete){
-			StudentManagerPage smp = new StudentManagerPage();
-			smp.setVisible(true);
-			this.setVisible(false);
-		} else if (e.getSource() == btnCancel){
-			StudentManagerPage smp = new StudentManagerPage();
-			smp.setVisible(true);
-			this.setVisible(false);
-		}
-		
-	}
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+
+        if (e.getSource() == btnDelete) {
+
+            String studentId = txtStudentId.getText().trim();
+
+            if (studentId.isEmpty()) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Student ID is required!",
+                        "Missing Information",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+
+            int confirm = JOptionPane.showConfirmDialog(
+                    this,
+                    "Are you sure you want to delete this student?",
+                    "Confirm Delete",
+                    JOptionPane.YES_NO_OPTION
+            );
+
+            if (confirm == JOptionPane.YES_OPTION) {
+				//add function of deletion when done
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Student deleted successfully!",
+                        "Success",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+
+                StudentManagerPage smp = new StudentManagerPage();
+                smp.setVisible(true);
+                this.setVisible(false);
+            }
+
+        } else if (e.getSource() == btnCancel) {
+
+            StudentManagerPage smp = new StudentManagerPage();
+            smp.setVisible(true);
+            this.setVisible(false);
+        }
+    }
 }
