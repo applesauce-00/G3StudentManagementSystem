@@ -3,15 +3,19 @@ package com.mycompany.g3studentmanagementsystem;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import com.toedter.calendar.JDateChooser;
+import java.util.Date;
 
-public class EditStudentPage extends JFrame implements ActionListener{
+public class EditStudentPage extends JFrame implements ActionListener {
 
-    private JLabel lblTitle, lblStudentId, lblName, lblSection, lblGender, lblBirthDate, lblEmail, lblGrades;
-    private JTextField txtStudentId, txtName, txtSection, txtGender, txtBirthDate, txtEmail, txtGrades;
+    private JLabel lblTitle, lblStudentId, lblName, lblSection, lblSex, lblBirthDate, lblEmail;
+    private JTextField txtStudentId, txtName, txtSection, txtEmail;
+    private JComboBox<String> cboSex;
+    private JDateChooser dateChooserBirth;
     private JButton btnEdit, btnCancel;
 
     EditStudentPage() {
-        // Frame settings
+
         setTitle("Edit Student");
         setSize(674, 924);
         setLayout(null);
@@ -19,7 +23,7 @@ public class EditStudentPage extends JFrame implements ActionListener{
         setLocationRelativeTo(null);
         getContentPane().setBackground(new Color(235, 242, 250));
 
-        // Title
+        // TITLE
         lblTitle = new JLabel("EDIT STUDENT");
         lblTitle.setFont(new Font("Arial", Font.BOLD, 22));
         lblTitle.setHorizontalAlignment(SwingConstants.CENTER);
@@ -31,7 +35,7 @@ public class EditStudentPage extends JFrame implements ActionListener{
         lblStudentId.setBounds(100, 100, 120, 25);
         add(lblStudentId);
 
-        txtStudentId = new JTextField("");
+        txtStudentId = new JTextField();
         txtStudentId.setBounds(250, 100, 200, 30);
         add(txtStudentId);
 
@@ -40,7 +44,7 @@ public class EditStudentPage extends JFrame implements ActionListener{
         lblName.setBounds(100, 170, 120, 25);
         add(lblName);
 
-        txtName = new JTextField("");
+        txtName = new JTextField();
         txtName.setBounds(250, 170, 200, 30);
         add(txtName);
 
@@ -49,45 +53,37 @@ public class EditStudentPage extends JFrame implements ActionListener{
         lblSection.setBounds(100, 240, 120, 25);
         add(lblSection);
 
-        txtSection = new JTextField("");
+        txtSection = new JTextField();
         txtSection.setBounds(250, 240, 200, 30);
         add(txtSection);
 
-        // GENDER
-        lblGender = new JLabel("GENDER:");
-        lblGender.setBounds(100, 310, 120, 25);
-        add(lblGender);
+        // SEX
+        lblSex = new JLabel("SEX:");
+        lblSex.setBounds(100, 310, 120, 25);
+        add(lblSex);
 
-        txtGender = new JTextField("");
-        txtGender.setBounds(250, 310, 200, 30);
-        add(txtGender);
+        cboSex = new JComboBox<>(new String[]{"Male", "Female"});
+        cboSex.setBounds(250, 310, 200, 30);
+        add(cboSex);
 
         // BIRTH DATE
         lblBirthDate = new JLabel("BIRTH DATE:");
         lblBirthDate.setBounds(100, 380, 120, 25);
         add(lblBirthDate);
 
-        txtBirthDate = new JTextField("");
-        txtBirthDate.setBounds(250, 380, 200, 30);
-        add(txtBirthDate);
+        dateChooserBirth = new JDateChooser();
+        dateChooserBirth.setDateFormatString("yyyy-MM-dd");
+        dateChooserBirth.setBounds(250, 380, 200, 30);
+        add(dateChooserBirth);
 
         // EMAIL
         lblEmail = new JLabel("EMAIL ADDRESS:");
         lblEmail.setBounds(100, 450, 140, 25);
         add(lblEmail);
 
-        txtEmail = new JTextField("");
+        txtEmail = new JTextField();
         txtEmail.setBounds(250, 450, 200, 30);
         add(txtEmail);
-
-        // GRADES
-        lblGrades = new JLabel("GRADES:");
-        lblGrades.setBounds(100, 520, 120, 25);
-        add(lblGrades);
-
-        txtGrades = new JTextField("");
-        txtGrades.setBounds(250, 520, 200, 30);
-        add(txtGrades);
 
         // BUTTONS
         btnEdit = new JButton("EDIT");
@@ -108,24 +104,59 @@ public class EditStudentPage extends JFrame implements ActionListener{
         btnCancel.setBorderPainted(false);
         add(btnCancel);
 
-		
-		
-		btnEdit.addActionListener(this);
-		btnCancel.addActionListener(this);
+        btnEdit.addActionListener(this);
+        btnCancel.addActionListener(this);
     }
-	
-	
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() == btnEdit){
-			StudentManagerPage smp = new StudentManagerPage();
-			smp.setVisible(true);
-			this.setVisible(false);
-		} else if (e.getSource() == btnCancel){
-			StudentManagerPage smp = new StudentManagerPage();
-			smp.setVisible(true);
-			this.setVisible(false);
-		}
-		
-	}
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+
+        if (e.getSource() == btnEdit) {
+
+            String studentId = txtStudentId.getText().trim();
+            String name = txtName.getText().trim();
+            String section = txtSection.getText().trim();
+            String email = txtEmail.getText().trim();
+            String sex = (String) cboSex.getSelectedItem();
+            Date birthDate = dateChooserBirth.getDate();
+
+            // EMPTY FIELD CHECK
+            if (studentId.isEmpty() ||
+                name.isEmpty() ||
+                section.isEmpty() ||
+                email.isEmpty() ||
+                sex == null ||
+                birthDate == null) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "All fields are required! Please fill in all information.",
+                        "Missing Information",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+
+            // EMAIL VALIDATION
+            if (!email.contains("@")) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Invalid email address! Must contain '@'",
+                        "Email Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+
+            StudentManagerPage smp = new StudentManagerPage();
+            smp.setVisible(true);
+            this.setVisible(false);
+
+        } else if (e.getSource() == btnCancel) {
+
+            StudentManagerPage smp = new StudentManagerPage();
+            smp.setVisible(true);
+            this.setVisible(false);
+        }
+    }
 }
