@@ -5,11 +5,12 @@ import java.awt.event.*;
 import javax.swing.*;
 import com.toedter.calendar.JDateChooser;
 import java.util.Date;
+import java.text.SimpleDateFormat;
 
 public class AddStudentPage extends JFrame implements ActionListener {
 
-    private JLabel lblTitle, lblStudentId, lblName, lblSection, lblSex, lblBirthDate, lblEmail;
-    private JTextField txtStudentId, txtName, txtSection, txtEmail;
+    private JLabel lblTitle, lblStudentId, lblName, lblSection, lblSex, lblBirthDate, lblEmail, lblPassword;
+    private JTextField txtStudentId, txtName, txtSection, txtEmail, txtPassword;
     private JComboBox<String> cboSex;
     private JDateChooser dateChooserBirth;
     private JButton btnAdd, btnCancel;
@@ -85,6 +86,15 @@ public class AddStudentPage extends JFrame implements ActionListener {
         txtEmail = new JTextField();
         txtEmail.setBounds(250, 450, 200, 30);
         add(txtEmail);
+		
+		// PASSWORD
+        lblPassword = new JLabel("PASSWORD:");
+        lblPassword.setBounds(100, 520, 140, 25);
+        add(lblPassword);
+
+        txtPassword = new JTextField();
+        txtPassword.setBounds(250, 520, 200, 30);
+        add(txtPassword);
 
         // ADD BUTTON
         btnAdd = new JButton("ADD");
@@ -116,38 +126,32 @@ public void actionPerformed(ActionEvent e) {
 
     if (e.getSource() == btnAdd) {
 
-        String studentId = txtStudentId.getText().trim();
-        String name = txtName.getText().trim();
-        String section = txtSection.getText().trim();
-        String email = txtEmail.getText().trim();
-        String sex = (String) cboSex.getSelectedItem();
-        Date birthDate = dateChooserBirth.getDate();
+    String studentId = txtStudentId.getText().trim();
+    String name = txtName.getText().trim();
+    String section = txtSection.getText().trim();
+    String email = txtEmail.getText().trim();
+    String password = txtPassword.getText().trim();
+    String sex = (String) cboSex.getSelectedItem();
 
-        if (studentId.isEmpty() ||
-            name.isEmpty() ||
-            section.isEmpty() ||
-            email.isEmpty() ||
-            sex == null ||
-            birthDate == null) {
+    if (studentId.isEmpty() || 
+			name.isEmpty() || 
+			section.isEmpty() || 
+			email.isEmpty() || 
+			password.isEmpty()|| 
+			dateChooserBirth.getDate() == null) {
 
-            JOptionPane.showMessageDialog(
-                    this,
-                    "All fields are required! Please fill in all information.",
-                    "Missing Information",
-                    JOptionPane.ERROR_MESSAGE
-            );
-            return;
-        }
+        JOptionPane.showMessageDialog(this, "Please fill all fields!");
+        return;
+    }
 
-        if (!email.contains("@")) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Invalid email address! Must contain '@'",
-                    "Email Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
-            return;
-        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		String birthDate = sdf.format(dateChooserBirth.getDate());
+
+		Student s = new Student(studentId, name, section, sex, birthDate, email, password);
+		StudentDataManager.addStudent(s);
+
+		JOptionPane.showMessageDialog(this, "Student Added Successfully!");
 
         StudentManagerPage smp = new StudentManagerPage();
         smp.setVisible(true);

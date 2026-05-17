@@ -96,9 +96,41 @@ public class FacultyLogInPage extends JFrame implements ActionListener{
 		if (e.getSource() == btnBack){
 			LandingPageGUI lp = new LandingPageGUI();
 			FrameSizeNavigation.navigate(this, lp);
-		} else if (e.getSource() == btnLogin){
-			StudentManagerPage smp = new StudentManagerPage();
-			FrameSizeNavigation.navigate(this, smp);
-		}
+		} else if (e.getSource() == btnLogin) {
+
+    String id = txtId.getText().trim();
+    String pass = new String(txtPassword.getPassword()).trim();
+
+    if (id.isEmpty() || pass.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Please fill in all fields!");
+        return;
+    }
+
+    int result = FacultyDataManager.validateLogin(id, pass);
+
+    switch (result) {
+
+        case 0:
+            JOptionPane.showMessageDialog(this, "Login Successful!");
+
+            StudentManagerPage smp = new StudentManagerPage();
+            FrameSizeNavigation.navigate(this, smp);
+            break;
+
+        case 1:
+            JOptionPane.showMessageDialog(this,
+                    "Incorrect password for this Faculty ID!",
+                    "Login Failed",
+                    JOptionPane.ERROR_MESSAGE);
+            break;
+
+        case 2:
+            JOptionPane.showMessageDialog(this,
+                    "Faculty ID not found!",
+                    "Login Failed",
+                    JOptionPane.ERROR_MESSAGE);
+            break;
+    }
 	}
+}
 }
