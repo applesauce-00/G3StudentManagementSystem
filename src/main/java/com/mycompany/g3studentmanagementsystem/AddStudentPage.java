@@ -143,6 +143,14 @@ public void actionPerformed(ActionEvent e) {
         JOptionPane.showMessageDialog(this, "Please fill all fields!");
         return;
     }
+	if (!email.contains("@")) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Invalid email address! Must contain '@'",
+                "Email Error",
+                JOptionPane.ERROR_MESSAGE);
+        return;
+    }
 
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
