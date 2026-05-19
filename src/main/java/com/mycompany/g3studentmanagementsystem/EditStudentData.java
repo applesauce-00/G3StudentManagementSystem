@@ -1,6 +1,5 @@
-package StudentDataHandler;
+package com.mycompany.g3studentmanagementsystem;
 
-import com.mycompany.g3studentmanagementsystem.EditStudentPage;
 import java.awt.event.*;
 import javax.swing.*;
 

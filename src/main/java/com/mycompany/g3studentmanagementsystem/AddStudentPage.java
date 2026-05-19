@@ -1,6 +1,5 @@
 package com.mycompany.g3studentmanagementsystem;
 
-import StudentDataHandler.AddStudentData;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -111,10 +110,10 @@ public class AddStudentPage extends JFrame implements ActionListener{
         btnCancel.setBorderPainted(false);
         add(btnCancel);
 
-        AddStudentData ads = new AddStudentData(this);
+        AddStudentData asd = new AddStudentData(this);
 
-        btnAdd.addActionListener(ads);
-        btnCancel.addActionListener(ads);
+        btnAdd.addActionListener(asd);
+        btnCancel.addActionListener(asd);
     }
 
 	@Override
