@@ -9,7 +9,7 @@ public class StudentLandingPage extends JFrame implements ActionListener {
 
     private JLabel lblIcon, lblTitle, lblId, lblName, lblCourse, lblContactNumber, lblYearLevel;
     private JTextField txtId, txtName, txtContactNumber;
-    private JButton btnSignOut, btnProfile, btnGrades, btnSubjects, btnReportCard, btnEnrollment, btnEnroll, btnDashBoard;
+    private JButton btnSignOut, btnProfile, btnGrades, btnSubjects, btnReportCard, btnEnrollment, btnEnroll;
     private JPanel ProfilePanel, GradesPanel, SubjectsPanel, ReportCardPanel, Enrollment;
     private JComboBox<String> cmbCourse, cmbYearLevel;
 
