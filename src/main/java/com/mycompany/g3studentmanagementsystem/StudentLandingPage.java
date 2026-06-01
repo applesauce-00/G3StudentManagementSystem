@@ -7,10 +7,10 @@ import javax.swing.table.*;
 
 public class StudentLandingPage extends JFrame implements ActionListener {
 
-    private JLabel lblWelcome, lblIcon, lblTitle, lblId, lblName, lblCourse, lblContactNumber, lblYearLevel, lblInfo;
+    private JLabel lblIcon, lblTitle, lblId, lblName, lblCourse, lblContactNumber, lblYearLevel;
     private JTextField txtId, txtName, txtContactNumber;
     private JButton btnSignOut, btnProfile, btnGrades, btnSubjects, btnReportCard, btnEnrollment, btnEnroll, btnDashBoard;
-    private JPanel DashBoardPanel, ProfilePanel, GradesPanel, SubjectsPanel, ReportCardPanel, Enrollment, SemesterDash, GwaDash, Standing;
+    private JPanel ProfilePanel, GradesPanel, SubjectsPanel, ReportCardPanel, Enrollment;
     private JComboBox<String> cmbCourse, cmbYearLevel;
 
     public StudentLandingPage() {
@@ -47,7 +47,7 @@ public class StudentLandingPage extends JFrame implements ActionListener {
           
         //Left sidebar button Profile
         btnProfile = new JButton("PROFILE");
-        btnProfile.setBounds(20, 150, 180, 40);
+        btnProfile.setBounds(20, 100, 180, 40);
         btnProfile.setBackground(new Color(52, 168, 235));
         btnProfile.setForeground(Color.WHITE);
         btnProfile.addActionListener(this);
@@ -66,11 +66,11 @@ public class StudentLandingPage extends JFrame implements ActionListener {
         JTable profileTable = new JTable(new DefaultTableModel(profileData, profileColumns));
         ProfilePanel.add(new JScrollPane(profileTable), BorderLayout.CENTER);
         add(ProfilePanel);
-        ProfilePanel.setVisible(false);
+        ProfilePanel.setVisible(true);
         
         //Left sidebar button Grades
         btnGrades = new JButton("GRADES");
-        btnGrades.setBounds(20, 200, 180, 40);
+        btnGrades.setBounds(20, 150, 180, 40);
         btnGrades.setBackground(new Color(52, 168, 235));
         btnGrades.setForeground(Color.WHITE);
         btnGrades.addActionListener(this);
@@ -92,7 +92,7 @@ public class StudentLandingPage extends JFrame implements ActionListener {
        
         //Left sidebar button Subjects
         btnSubjects = new JButton("SUBJECT");
-        btnSubjects.setBounds(20, 250, 180, 40);
+        btnSubjects.setBounds(20, 200, 180, 40);
         btnSubjects.setBackground(new Color(52, 168, 235));
         btnSubjects.setForeground(Color.WHITE);
         btnSubjects.addActionListener(this);
@@ -114,7 +114,7 @@ public class StudentLandingPage extends JFrame implements ActionListener {
         
         //Left sidebar button ReportCard
         btnReportCard = new JButton("REPORT CARD");
-        btnReportCard.setBounds(20, 300, 180, 40);
+        btnReportCard.setBounds(20, 250, 180, 40);
         btnReportCard.setBackground(new Color(52, 168, 235));
         btnReportCard.setForeground(Color.WHITE);
         btnReportCard.addActionListener(this);
@@ -135,7 +135,7 @@ public class StudentLandingPage extends JFrame implements ActionListener {
         
         //Left sidebar Button Enrollment
         btnEnrollment = new JButton("ENROLLMENT");
-        btnEnrollment.setBounds(20, 350, 180, 40);
+        btnEnrollment.setBounds(20, 300, 180, 40);
         btnEnrollment.setBackground(new Color(52, 168, 235));
         btnEnrollment.setForeground(Color.WHITE);
         btnEnrollment.addActionListener(this);
@@ -193,65 +193,13 @@ public class StudentLandingPage extends JFrame implements ActionListener {
        Enrollment.add(btnEnroll);
        add(Enrollment);
        Enrollment.setVisible(false);
-       
-       //Left sidebar Button DashBoard
-       btnDashBoard = new JButton("DASHBOARD");
-       btnDashBoard.setBounds(20, 100, 180, 40);
-       btnDashBoard.setBackground(new Color(52, 168, 235));
-       btnDashBoard.setForeground(Color.WHITE);
-       btnDashBoard.addActionListener(this);
-       add(btnDashBoard);
-       
-       //Right sidebar Panel Dashboard
-       DashBoardPanel = new JPanel();
-       DashBoardPanel.setLayout(null);
-       DashBoardPanel.setBounds(250, 100, 700, 500);
-        
-       lblWelcome = new JLabel("Welcome to the Student Portal!",SwingConstants.CENTER);
-       lblWelcome.setFont(new Font("Arial", Font.BOLD, 24));
-       lblWelcome.setBounds(150, 50, 400, 40);
-       DashBoardPanel.add(lblWelcome);
-       
-       lblInfo = new JLabel("Quick access to your academic essentials — just a click away.", SwingConstants.CENTER);
-       lblInfo.setFont(new Font("Arial", Font.PLAIN, 14));
-       lblInfo.setBounds(50, 80, 600, 30);
-       DashBoardPanel.add(lblInfo);
-       
-       SemesterDash = new JPanel();
-       SemesterDash.setBackground(new Color(210, 230, 255));
-       SemesterDash.setBounds(50, 150, 180, 80);
-       SemesterDash.setLayout(new BorderLayout());
-       SemesterDash.add(new JLabel("Current Semester", SwingConstants.CENTER), BorderLayout.NORTH);
-       SemesterDash.add(new JLabel("2nd Semester", SwingConstants.CENTER), BorderLayout.CENTER);
-       DashBoardPanel.add(SemesterDash);
-       
-       GwaDash = new JPanel();
-       GwaDash.setBackground(new Color(210, 255, 210));
-       GwaDash.setBounds(260, 150, 180, 80);
-       GwaDash.setLayout(new BorderLayout());
-       GwaDash.add(new JLabel("GWA", SwingConstants.CENTER), BorderLayout.NORTH);
-       GwaDash.add(new JLabel("1.75", SwingConstants.CENTER), BorderLayout.CENTER);
-       DashBoardPanel.add(GwaDash);
-       
-       Standing = new JPanel();
-       Standing.setBackground(new Color(255, 230, 210));
-       Standing.setBounds(470, 150, 180, 80);
-       Standing.setLayout(new BorderLayout());
-       Standing.add(new JLabel("Standing", SwingConstants.CENTER), BorderLayout.NORTH);
-       Standing.add(new JLabel("Good Standing", SwingConstants.CENTER), BorderLayout.CENTER);
-       DashBoardPanel.add(Standing);
-       
-       add(DashBoardPanel);
-       DashBoardPanel.setVisible(true);
-        
+             
     }
     
-
     @Override
     public void actionPerformed(ActionEvent e) {
         
         //To Hide all panels First
-        DashBoardPanel.setVisible(false);
         ProfilePanel.setVisible(false);
         GradesPanel.setVisible(false);
         SubjectsPanel.setVisible(false);
@@ -263,9 +211,6 @@ public class StudentLandingPage extends JFrame implements ActionListener {
             lp.setVisible(true);
             this.setVisible(false); 
         }
-        else if (e.getSource() == btnDashBoard){
-        DashBoardPanel.setVisible(true);
-        } 
         else if (e.getSource() == btnProfile) {
         ProfilePanel.setVisible(true);   
         }   
