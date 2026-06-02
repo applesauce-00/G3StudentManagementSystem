@@ -187,13 +187,13 @@ public class AddStudentPage extends JFrame implements ActionListener {
             StudentManagerPage smp = new StudentManagerPage();
             smp.setVisible(true);
             this.setVisible(false);
-            this.setVisible(false);
+            this.dispose();
 
         } else if (e.getSource() == btnCancel) {
             StudentManagerPage smp = new StudentManagerPage();
             smp.setVisible(true);
             this.setVisible(false);
-            this.setVisible(false);
+            this.dispose();
         }
     }
 }
