@@ -6,12 +6,14 @@ import javax.swing.*;
 
 public class DeleteStudentPage extends JFrame implements ActionListener {
 
-    private JLabel lblTitle, lblStudentId, lblName, lblSection, lblSex, lblBirthDate, lblEmail;
-    private JLabel dpName, dpSection, dpSex, dpBirthDate, dpEmail;
+    private JLabel lblTitle, lblStudentId, lblLastName, lblFirstName, lblMiddleName, lblSection, lblSex, lblBirthDate, lblEmail;
+    private JLabel dpLastName, dpFirstName, dpMiddleName, dpSection, dpSex, dpBirthDate, dpEmail;
     private JTextField txtStudentId;
     private JButton btnDelete, btnCancel;
+    private String studentTargetId;
 
-    DeleteStudentPage() {
+    public DeleteStudentPage(Student student) {
+        this.studentTargetId = student.getId();
 
         setTitle("Delete Student");
         setSize(674, 924);
@@ -32,58 +34,79 @@ public class DeleteStudentPage extends JFrame implements ActionListener {
         lblStudentId.setBounds(100, 100, 120, 25);
         add(lblStudentId);
 
-        txtStudentId = new JTextField();
+        txtStudentId = new JTextField(studentTargetId);
         txtStudentId.setBounds(250, 100, 200, 30);
+        txtStudentId.setEditable(false);
         add(txtStudentId);
 
-        // NAME (DISPLAY ONLY)
-        lblName = new JLabel("NAME:");
-        lblName.setBounds(100, 170, 120, 25);
-        add(lblName);
+        // LAST NAME (DISPLAY ONLY)
+        lblLastName = new JLabel("LAST NAME:");
+        lblLastName.setBounds(100, 160, 120, 25);
+        add(lblLastName);
 
-        dpName = new JLabel("");
-        dpName.setBounds(250, 170, 200, 30);
-        add(dpName);
+        dpLastName = new JLabel(student.getLastName());
+        dpLastName.setBounds(250, 160, 200, 30);
+        dpLastName.setFont(new Font("Arial", Font.BOLD, 14));
+        add(dpLastName);
+
+        // FIRST NAME (DISPLAY ONLY)
+        lblFirstName = new JLabel("FIRST NAME:");
+        lblFirstName.setBounds(100, 220, 120, 25);
+        add(lblFirstName);
+
+        dpFirstName = new JLabel(student.getFirstName());
+        dpFirstName.setBounds(250, 220, 200, 30);
+        dpFirstName.setFont(new Font("Arial", Font.BOLD, 14));
+        add(dpFirstName);
+
+        // MIDDLE NAME (DISPLAY ONLY)
+        lblMiddleName = new JLabel("MIDDLE NAME:");
+        lblMiddleName.setBounds(100, 280, 120, 25);
+        add(lblMiddleName);
+
+        dpMiddleName = new JLabel(student.getMiddleName().isEmpty() ? "None" : student.getMiddleName());
+        dpMiddleName.setBounds(250, 280, 200, 30);
+        add(dpMiddleName);
 
         // SECTION
         lblSection = new JLabel("SECTION:");
-        lblSection.setBounds(100, 240, 120, 25);
+        lblSection.setBounds(100, 340, 120, 25);
         add(lblSection);
 
-        dpSection = new JLabel("");
-        dpSection.setBounds(250, 240, 200, 30);
+        dpSection = new JLabel(student.getSection());
+        dpSection.setBounds(250, 340, 200, 30);
         add(dpSection);
 
         // SEX
         lblSex = new JLabel("SEX:");
-        lblSex.setBounds(100, 310, 120, 25);
+        lblSex.setBounds(100, 400, 120, 25);
         add(lblSex);
 
-        dpSex = new JLabel("");
-        dpSex.setBounds(250, 310, 200, 30);
+        dpSex = new JLabel(student.getSex() == 'M' ? "Male" : "Female");
+        dpSex.setBounds(250, 400, 200, 30);
         add(dpSex);
 
         // BIRTH DATE
         lblBirthDate = new JLabel("BIRTH DATE:");
-        lblBirthDate.setBounds(100, 380, 120, 25);
+        lblBirthDate.setBounds(100, 460, 120, 25);
         add(lblBirthDate);
 
-        dpBirthDate = new JLabel("");
-        dpBirthDate.setBounds(250, 380, 200, 30);
+        dpBirthDate = new JLabel(student.getBirthDate());
+        dpBirthDate.setBounds(250, 460, 200, 30);
         add(dpBirthDate);
 
         // EMAIL
         lblEmail = new JLabel("EMAIL ADDRESS:");
-        lblEmail.setBounds(100, 450, 140, 25);
+        lblEmail.setBounds(100, 520, 140, 25);
         add(lblEmail);
 
-        dpEmail = new JLabel("");
-        dpEmail.setBounds(250, 450, 200, 30);
+        dpEmail = new JLabel(student.getEmail());
+        dpEmail.setBounds(250, 520, 200, 30);
         add(dpEmail);
 
         // DELETE BUTTON
         btnDelete = new JButton("DELETE");
-        btnDelete.setBounds(230, 650, 100, 40);
+        btnDelete.setBounds(230, 680, 100, 40);
         btnDelete.setBackground(new Color(52, 168, 235));
         btnDelete.setForeground(Color.WHITE);
         btnDelete.setFont(new Font("Arial", Font.BOLD, 14));
@@ -93,7 +116,7 @@ public class DeleteStudentPage extends JFrame implements ActionListener {
 
         // CANCEL BUTTON
         btnCancel = new JButton("CANCEL");
-        btnCancel.setBounds(360, 650, 100, 40);
+        btnCancel.setBounds(360, 680, 100, 40);
         btnCancel.setBackground(new Color(224, 69, 52));
         btnCancel.setForeground(Color.WHITE);
         btnCancel.setFont(new Font("Arial", Font.BOLD, 14));
@@ -122,45 +145,44 @@ public class DeleteStudentPage extends JFrame implements ActionListener {
                 return;
             }
 
-
-            if (studentId.isEmpty()) {
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Student ID is required!",
-                        "Missing Information",
-                        JOptionPane.ERROR_MESSAGE
-                );
-                return;
-            }
-
-
             int confirm = JOptionPane.showConfirmDialog(
                     this,
                     "Are you sure you want to delete this student?",
                     "Confirm Delete",
-                    JOptionPane.YES_NO_OPTION
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.WARNING_MESSAGE
             );
 
             if (confirm == JOptionPane.YES_OPTION) {
-				//add function of deletion when done
+                boolean isDeleted = StudentDataManager.deleteStudent(studentId);
 
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Student deleted successfully!",
-                        "Success",
-                        JOptionPane.INFORMATION_MESSAGE
-                );
+                if (isDeleted) {
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Student deleted successfully!",
+                            "Success",
+                            JOptionPane.INFORMATION_MESSAGE
+                    );
+                } else {
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Error: Student could not be found.",
+                            "Deletion Failed",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                }
 
                 StudentManagerPage smp = new StudentManagerPage();
                 smp.setVisible(true);
                 this.setVisible(false);
+                this.dispose(); 
             }
 
         } else if (e.getSource() == btnCancel) {
-
             StudentManagerPage smp = new StudentManagerPage();
             smp.setVisible(true);
             this.setVisible(false);
+            this.dispose(); 
         }
     }
 }

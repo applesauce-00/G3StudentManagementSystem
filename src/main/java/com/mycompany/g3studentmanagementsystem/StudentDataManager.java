@@ -3,7 +3,7 @@ package com.mycompany.g3studentmanagementsystem;
 import java.util.ArrayList;
 
 public class StudentDataManager {
-	
+    
     public static ArrayList<Student> students = new ArrayList<>();
 
     // ADD
@@ -14,7 +14,7 @@ public class StudentDataManager {
     // FIND
     public static Student findStudent(String id) {
         for (Student s : students) {
-            if (s.studentId.equalsIgnoreCase(id)) {
+            if (s.getId().equalsIgnoreCase(id)) {
                 return s;
             }
         }

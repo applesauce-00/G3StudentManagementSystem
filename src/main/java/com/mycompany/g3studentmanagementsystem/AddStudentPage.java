@@ -4,24 +4,20 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import com.toedter.calendar.JDateChooser;
-import java.util.Date;
 import java.text.SimpleDateFormat;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.util.Date;
 
 public class AddStudentPage extends JFrame implements ActionListener {
 
-    private JLabel lblTitle, lblStudentId, lblName, lblSection, lblSex, lblBirthDate, lblEmail, lblPassword;
-    private JTextField txtStudentId, txtName, txtSection, txtEmail, txtPassword;
+    private JLabel lblTitle, lblStudentId, lblLastName, lblFirstName, lblMiddleName, lblSection, lblSex, lblBirthDate, lblEmail, lblPassword;
+    private JTextField txtStudentId, txtLastName, txtFirstName, txtMiddleName, txtSection, txtEmail;
+    private JPasswordField txtPassword;
     private JComboBox<String> cboSex;
     private JDateChooser dateChooserBirth;
     private JButton btnAdd, btnCancel;
 
-    AddStudentPage() {
+    public AddStudentPage() {
 
-        // FRAME SETTINGS
         setTitle("Add Student");
         setSize(674, 924);
         setLayout(null);
@@ -29,7 +25,6 @@ public class AddStudentPage extends JFrame implements ActionListener {
         setLocationRelativeTo(null);
         getContentPane().setBackground(new Color(235, 242, 250));
 
-        // TITLE
         lblTitle = new JLabel("ADD STUDENT");
         lblTitle.setFont(new Font("Arial", Font.BOLD, 22));
         lblTitle.setHorizontalAlignment(SwingConstants.CENTER);
@@ -45,64 +40,83 @@ public class AddStudentPage extends JFrame implements ActionListener {
         txtStudentId.setBounds(250, 100, 200, 30);
         add(txtStudentId);
 
-        // NAME
-        lblName = new JLabel("NAME:");
-        lblName.setBounds(100, 170, 120, 25);
-        add(lblName);
+        // LAST NAME
+        lblLastName = new JLabel("LAST NAME:");
+        lblLastName.setBounds(100, 160, 120, 25);
+        add(lblLastName);
 
-        txtName = new JTextField();
-        txtName.setBounds(250, 170, 200, 30);
-        add(txtName);
+        txtLastName = new JTextField();
+        txtLastName.setBounds(250, 160, 200, 30);
+        add(txtLastName);
+
+        // FIRST NAME
+        lblFirstName = new JLabel("FIRST NAME:");
+        lblFirstName.setBounds(100, 220, 120, 25);
+        add(lblFirstName);
+
+        txtFirstName = new JTextField();
+        txtFirstName.setBounds(250, 220, 200, 30);
+        add(txtFirstName);
+
+        // MIDDLE NAME
+        lblMiddleName = new JLabel("MIDDLE NAME:");
+        lblMiddleName.setBounds(100, 280, 120, 25);
+        add(lblMiddleName);
+
+        txtMiddleName = new JTextField();
+        txtMiddleName.setBounds(250, 280, 200, 30);
+        add(txtMiddleName);
 
         // SECTION
         lblSection = new JLabel("SECTION:");
-        lblSection.setBounds(100, 240, 120, 25);
+        lblSection.setBounds(100, 340, 120, 25);
         add(lblSection);
 
         txtSection = new JTextField();
-        txtSection.setBounds(250, 240, 200, 30);
+        txtSection.setBounds(250, 340, 200, 30);
         add(txtSection);
 
         // SEX
         lblSex = new JLabel("SEX:");
-        lblSex.setBounds(100, 310, 120, 25);
+        lblSex.setBounds(100, 400, 120, 25);
         add(lblSex);
 
         cboSex = new JComboBox<>(new String[]{"Male", "Female"});
-        cboSex.setBounds(250, 310, 200, 30);
+        cboSex.setBounds(250, 400, 200, 30);
         add(cboSex);
 
-        // BIRTHDATE
+        // BIRTH DATE
         lblBirthDate = new JLabel("BIRTH DATE:");
-        lblBirthDate.setBounds(100, 380, 120, 25);
+        lblBirthDate.setBounds(100, 460, 120, 25);
         add(lblBirthDate);
 
         dateChooserBirth = new JDateChooser();
         dateChooserBirth.setDateFormatString("yyyy-MM-dd");
-        dateChooserBirth.setBounds(250, 380, 200, 30);
+        dateChooserBirth.setBounds(250, 460, 200, 30);
+        dateChooserBirth.setDate(new Date());
         add(dateChooserBirth);
 
         // EMAIL
         lblEmail = new JLabel("EMAIL ADDRESS:");
-        lblEmail.setBounds(100, 450, 140, 25);
+        lblEmail.setBounds(100, 520, 140, 25);
         add(lblEmail);
 
         txtEmail = new JTextField();
-        txtEmail.setBounds(250, 450, 200, 30);
+        txtEmail.setBounds(250, 520, 200, 30);
         add(txtEmail);
 
         // PASSWORD
         lblPassword = new JLabel("PASSWORD:");
-        lblPassword.setBounds(100, 520, 140, 25);
+        lblPassword.setBounds(100, 580, 140, 25);
         add(lblPassword);
 
-        txtPassword = new JTextField();
-        txtPassword.setBounds(250, 520, 200, 30);
+        txtPassword = new JPasswordField();
+        txtPassword.setBounds(250, 580, 200, 30);
         add(txtPassword);
 
-        // ADD BUTTON
+        // CONTROL BUTTON INTERFACES
         btnAdd = new JButton("ADD");
-        btnAdd.setBounds(230, 650, 100, 40);
+        btnAdd.setBounds(230, 700, 100, 40);
         btnAdd.setBackground(new Color(52, 168, 235));
         btnAdd.setForeground(Color.WHITE);
         btnAdd.setFont(new Font("Arial", Font.BOLD, 14));
@@ -110,9 +124,8 @@ public class AddStudentPage extends JFrame implements ActionListener {
         btnAdd.setBorderPainted(false);
         add(btnAdd);
 
-        // CANCEL BUTTON
         btnCancel = new JButton("CANCEL");
-        btnCancel.setBounds(360, 650, 100, 40);
+        btnCancel.setBounds(360, 700, 100, 40);
         btnCancel.setBackground(new Color(224, 69, 52));
         btnCancel.setForeground(Color.WHITE);
         btnCancel.setFont(new Font("Arial", Font.BOLD, 14));
@@ -120,7 +133,6 @@ public class AddStudentPage extends JFrame implements ActionListener {
         btnCancel.setBorderPainted(false);
         add(btnCancel);
 
-        // ACTIONS
         btnAdd.addActionListener(this);
         btnCancel.addActionListener(this);
     }
@@ -130,82 +142,57 @@ public class AddStudentPage extends JFrame implements ActionListener {
 
         if (e.getSource() == btnAdd) {
 
-    String studentId = txtStudentId.getText().trim();
-            String name = txtName.getText().trim();
+            String studentId = txtStudentId.getText().trim();
+            String lastName = txtLastName.getText().trim();
+            String firstName = txtFirstName.getText().trim();
+            String middleName = txtMiddleName.getText().trim();
             String section = txtSection.getText().trim();
             String email = txtEmail.getText().trim();
-            String password = txtPassword.getText().trim();
-            String sex = (String) cboSex.getSelectedItem();
+            String password = new String(txtPassword.getPassword()).trim();
+            String sexStr = (String) cboSex.getSelectedItem();
 
-    if (studentId.isEmpty() || 
-			name.isEmpty() || 
-			section.isEmpty() || 
-			email.isEmpty() || 
-			password.isEmpty()|| 
-			dateChooserBirth.getDate() == null) {
+            // EMPTY FIELD CHECK 
+            if (studentId.isEmpty() || 
+                lastName.isEmpty() || 
+                firstName.isEmpty() || 
+                section.isEmpty() || 
+                email.isEmpty() || 
+                password.isEmpty() || 
+                dateChooserBirth.getDate() == null) {
 
-                JOptionPane.showMessageDialog(this, "Please fill all fields!");
+                JOptionPane.showMessageDialog(this, "Please fill all required fields!");
                 return;
             }
+
+            // EMAIL VALIDATION
             if (!email.contains("@")) {
-            JOptionPane.showMessageDialog(
-                this,
-                "Invalid email address! Must contain '@'",
-                "Email Error",
-                JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Invalid email address! Must contain '@'",
+                    "Email Error",
+                    JOptionPane.ERROR_MESSAGE);
                 return;
             }
-
 
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             String birthDate = sdf.format(dateChooserBirth.getDate());
 
-		  try {
-                   Connection con = DriverManager.getConnection(
-                    "jdbc:mysql://localhost:3306/swing_demo",
-                    "root",
-                    "");
+            char sex = (sexStr != null && sexStr.equalsIgnoreCase("Male")) ? 'M' : 'F';
 
-                   PreparedStatement st = con.prepareStatement(
-                    "INSERT INTO student(student_id, name, section, sex, birth_date, email, password) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?)");
+            Student s = new Student(studentId, lastName, firstName, middleName, section, sex, birthDate, email, password);
+            StudentDataManager.addStudent(s);
 
-                   st.setString(1, studentId);
-                   st.setString(2, name);
-                   st.setString(3, section);
-                   st.setString(4, sex);
-                   st.setString(5, birthDate);
-                   st.setString(6, email);
-                   st.setString(7, password);
+            JOptionPane.showMessageDialog(this, "Student Added Successfully!");
 
-                   st.executeUpdate();
-
-                   JOptionPane.showMessageDialog(this, "Student Added Successfully!");
-
-                   st.close();
-                   con.close();
-
-                   StudentManagerPage smp = new StudentManagerPage();
-                   smp.setVisible(true);
-                   this.dispose();
-
-                } catch (SQLException ex) {
-                   ex.printStackTrace();
-                   JOptionPane.showMessageDialog(
-                          this,
-                          "Error saving student!",
-                          "Database Error",
-                          JOptionPane.ERROR_MESSAGE);
-                }
-                  
-        StudentManagerPage smp = new StudentManagerPage();
-        smp.setVisible(true);
+            StudentManagerPage smp = new StudentManagerPage();
+            smp.setVisible(true);
+            this.setVisible(false);
             this.setVisible(false);
 
         } else if (e.getSource() == btnCancel) {
-
-        StudentManagerPage smp = new StudentManagerPage();
-        smp.setVisible(true);
+            StudentManagerPage smp = new StudentManagerPage();
+            smp.setVisible(true);
+            this.setVisible(false);
             this.setVisible(false);
         }
     }
