@@ -6,6 +6,10 @@ import javax.swing.*;
 import com.toedter.calendar.JDateChooser;
 import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 public class AddStudentPage extends JFrame implements ActionListener {
 
@@ -156,11 +160,44 @@ public class AddStudentPage extends JFrame implements ActionListener {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             String birthDate = sdf.format(dateChooserBirth.getDate());
 
-		Student s = new Student(studentId, name, section, sex, birthDate, email, password);
-            StudentDataManager.addStudent(s);
+		  try {
+                   Connection con = DriverManager.getConnection(
+                    "jdbc:mysql://localhost:3306/swing_demo",
+                    "root",
+                    "");
 
-            JOptionPane.showMessageDialog(this, "Student Added Successfully!");
+                   PreparedStatement st = con.prepareStatement(
+                    "INSERT INTO student(student_id, name, section, sex, birth_date, email, password) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?)");
 
+                   st.setString(1, studentId);
+                   st.setString(2, name);
+                   st.setString(3, section);
+                   st.setString(4, sex);
+                   st.setString(5, birthDate);
+                   st.setString(6, email);
+                   st.setString(7, password);
+
+                   st.executeUpdate();
+
+                   JOptionPane.showMessageDialog(this, "Student Added Successfully!");
+
+                   st.close();
+                   con.close();
+
+                   StudentManagerPage smp = new StudentManagerPage();
+                   smp.setVisible(true);
+                   this.dispose();
+
+                } catch (SQLException ex) {
+                   ex.printStackTrace();
+                   JOptionPane.showMessageDialog(
+                          this,
+                          "Error saving student!",
+                          "Database Error",
+                          JOptionPane.ERROR_MESSAGE);
+                }
+                  
         StudentManagerPage smp = new StudentManagerPage();
         smp.setVisible(true);
             this.setVisible(false);
