@@ -12,10 +12,16 @@ public class GradesEditorPage extends JFrame implements ActionListener{
     private JButton btnSearch, btnEdit, btnSave, btnCancel;
     private JTable tblGrades;
     private JScrollPane tableScroll;
-	private JTextField txtSearchId;
+    private JTextField txtSearchId;
+    private DefaultTableModel model;
+    private GradesManagerPage parent;
+    private int selectedRow;
+    
 
-    GradesEditorPage() {
-		
+    GradesEditorPage( GradesManagerPage parent,int selectedRow,DefaultTableModel model) {
+        this.parent = parent;
+        this.selectedRow = selectedRow;
+        this.model = model;    
 		// Frame Settings
         setTitle("FACULTY PORTAL - Grades Editor");
         setSize(1024, 764);
@@ -64,16 +70,6 @@ public class GradesEditorPage extends JFrame implements ActionListener{
         btnGrades.setForeground(Color.WHITE);
         add(btnGrades);
 
-		
-		
-
-		
-		
-		
-		
-		
-		
-		
 		//Side Panel
 
         // Search Field 
@@ -116,7 +112,25 @@ public class GradesEditorPage extends JFrame implements ActionListener{
         String[] columns = {"STUDENT ID", "NAME", "SECTION", "UNITS", "FINAL GRADE", "GRADE STATUS"};
         Object[][] data = new Object[0][6];
 
-        tblGrades = new JTable(new DefaultTableModel(data, columns));
+        DefaultTableModel editorModel =
+                new DefaultTableModel(columns, 0) {
+
+            @Override
+            public  boolean isCellEditable(int row,int column){
+            return column == 4 || column == 5;
+            }
+        };
+            editorModel.addRow(new Object[]{
+            model.getValueAt(selectedRow, 0),
+            model.getValueAt(selectedRow, 1),
+            model.getValueAt(selectedRow, 2),
+            model.getValueAt(selectedRow, 3),
+            model.getValueAt(selectedRow, 4),
+            model.getValueAt(selectedRow, 5)
+        });
+        
+        tblGrades = new JTable(editorModel);
+        
         tableScroll = new JScrollPane(tblGrades);
         tableScroll.setBounds(200, 100, 780, 550);
         add(tableScroll);
@@ -126,26 +140,49 @@ public class GradesEditorPage extends JFrame implements ActionListener{
 		btnCancel.addActionListener(this);
 		btnSave.addActionListener(this);
 		btnSearch.addActionListener(this);
-		
-		
-		
-		
+	
     }
-
+ 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == btnCancel){
-			GradesManagerPage gmp = new GradesManagerPage();
-			FrameSizeNavigation.navigate(this, gmp);
+			
+			parent.setVisible(true);
+                        dispose();
+		} else if (e.getSource() == btnEdit){
+                        int selectedRow = tblGrades.getSelectedRow();
+                        if (selectedRow == -1) {
+                        JOptionPane.showMessageDialog(this, "Please select a student." );
+                        return;
+                    }
+                        JOptionPane.showMessageDialog(this, "You can edit the grades.");
+//			EditStudentPage esp = new EditStudentPage();           on work
+//			esp.setVisible(true);
 		} else if (e.getSource() == btnSave){
-			GradesManagerPage gmp = new GradesManagerPage();
-			FrameSizeNavigation.navigate(this, gmp);
-		} 
-		else if (e.getSource() == btnSearch){
+                        DefaultTableModel editorModel = (DefaultTableModel) tblGrades.getModel();
+                        model.setValueAt(editorModel.getValueAt(0, 4),selectedRow,4);
+                        // Update Grade Status
+                        model.setValueAt(editorModel.getValueAt(0, 5),selectedRow,5);
+                        // Refresh table
+                        model.fireTableRowsUpdated(selectedRow,selectedRow);
+                        parent.setVisible(true);
+                        JOptionPane.showMessageDialog(this, "Grades saved successfully!","Successfully",JOptionPane.INFORMATION_MESSAGE);                        
+                        dispose();
+		} else if (e.getSource() == btnSearch){
+                    String searchId = txtSearchId.getText().trim();
+
+                    String studentId = tblGrades.getValueAt(0, 0).toString();
+
+                    if (studentId.equals(searchId)) {
+                        tblGrades.setRowSelectionInterval(0, 0);
+                        JOptionPane.showMessageDialog(this,"Student Found!","Information Found",JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(this,"Student Not Found!","Error",JOptionPane.ERROR_MESSAGE);
+                    }
+            }
+        }
+                    
 //			GradesManagerPage gmp = new GradesManagerPage();       on work
 //			gmp.setVisible(true);
-		} 
-	}
-
-    
-}
+} 
+       
