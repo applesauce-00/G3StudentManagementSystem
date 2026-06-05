@@ -103,17 +103,17 @@ public class GradesManagerPage extends JFrame implements ActionListener{
        
 
         // Student Table 
-        String[] columns = {"STUDENT ID", "NAME", "SECTION", "UNITS", "FINAL GRADE", "GRADE STATUS"};
-        Object[][] data = new Object[0][6];
+        String[] columns = {"STUDENT ID", "NAME", "SECTION", "MATH", "SCIENCE", "ENGLISH", "GWA", "GRADE STATUS"};
+        Object[][] data = new Object[0][8];
 
         tblGrades = new JTable(new DefaultTableModel(data, columns));
         tableScroll = new JScrollPane(tblGrades);
         tableScroll.setBounds(200, 100, 780, 550);
         add(tableScroll);
         
-        addStudentGrade("2024-00001-BN-0","Pedro De Guzman", "BSCPE 3-1","3","1.50", "PASSED");
-        addStudentGrade("2024-00002-BN-0","Jay Saragon", "BSIT 1-1", "3", "2.00", "PASSED");
-        addStudentGrade("2024-00003-BN-0","Jun Capuz", "BSBA 4-1", "3", "5.00", "FAILED");
+        addStudentGrade("2024-00001-BN-0","Pedro De Guzman", "BSCPE 3-1","1.50","1.50","2.00", "1.00", "PASSED");
+		addStudentGrade("2024-00002-BN-0","Jay Saragon", "BSIT 2-1","1.50","1.50","2.00", "1.75", "PASSED");
+		addStudentGrade("2024-00003-BN-0","Manny Salonga", "BSIE 1-1","1.50","1.75","1.00", "1.00", "PASSED");
         
         btnAttendance.addActionListener(this);
 		btnEdit.addActionListener(this);
@@ -168,17 +168,19 @@ public class GradesManagerPage extends JFrame implements ActionListener{
 		} 
             }
         
-         public void addStudentGrade(String id, String name, String section,String units, String finalGrade, String status){
-                        DefaultTableModel model = (DefaultTableModel) tblGrades.getModel();
-                        model.addRow(new Object[]{
-                        id,
-                        name,
-                        section,
-                        units,
-                        finalGrade,
-                        status
-                    });
-    }
+         public void addStudentGrade(String id, String name, String section, String math, String science, String english, String gwa, String status) {
+			DefaultTableModel model = (DefaultTableModel) tblGrades.getModel();
+			model.addRow(new Object[]{
+				id,
+				name,
+				section,
+				math,
+				science,
+				english,
+				gwa,
+				status
+    });
+}
 
     
 }

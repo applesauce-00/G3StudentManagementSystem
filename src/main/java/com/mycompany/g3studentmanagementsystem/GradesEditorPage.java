@@ -109,8 +109,8 @@ public class GradesEditorPage extends JFrame implements ActionListener{
        
 
         // Student Table 
-        String[] columns = {"STUDENT ID", "NAME", "SECTION", "UNITS", "FINAL GRADE", "GRADE STATUS"};
-        Object[][] data = new Object[0][6];
+        String[] columns = {"STUDENT ID", "NAME", "SECTION", "MATH", "SCIENCE", "ENGLISH", "GWA", "GRADE STATUS"};
+        Object[][] data = new Object[0][8];
 
         DefaultTableModel editorModel =
                 new DefaultTableModel(columns, 0) {

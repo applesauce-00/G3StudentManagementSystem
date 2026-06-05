@@ -1,35 +1,58 @@
 package com.mycompany.g3studentmanagementsystem;
 
 import java.util.ArrayList;
+import java.sql.*;	
 
 public class FacultyDataManager {
 
     public static ArrayList<Faculty> facultyList = new ArrayList<>();
 
-    // SEEDS FACULTY
-    static {
-        facultyList.add(new Faculty("admin", "admin123"));
-        facultyList.add(new Faculty("prof1", "pass123"));
-    }
 
 
     public static int validateLogin(String id, String password) {
 
-        for (Faculty f : facultyList) {
+    try {
 
+        Connection con = DriverManager.getConnection(
+                "jdbc:mysql://localhost:3306/g3studentmgmtsystem",
+                "root",
+                ""
+        );
 
-            if (f.facultyId.equals(id)) {
+        PreparedStatement ps = con.prepareStatement(
+                "SELECT * FROM faculty WHERE faculty_id=? AND password=?"
+        );
 
+        ps.setString(1, id);
+        ps.setString(2, password);
 
-                if (f.password.equals(password)) {
-                    return 0; 
-                }
+        ResultSet rs = ps.executeQuery();
 
-                
-                return 1; 
-            }
+        if (rs.next()) {
+            con.close();
+            return 0;
         }
 
+        // Checking of ID if it exist
+        ps = con.prepareStatement(
+                "SELECT * FROM faculty WHERE faculty_id=?"
+        );
+
+        ps.setString(1, id);
+
+        rs = ps.executeQuery();
+
+        if (rs.next()) {
+            con.close();
+            return 1;
+        }
+
+        con.close();
+        return 2;
+
+    } catch (SQLException e) {
+        e.printStackTrace();
         return 2;
     }
+}
 }
