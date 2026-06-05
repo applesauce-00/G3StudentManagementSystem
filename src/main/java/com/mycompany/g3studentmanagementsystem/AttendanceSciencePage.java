@@ -3,7 +3,7 @@ package com.mycompany.g3studentmanagementsystem;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.table.*;
 
 public class AttendanceSciencePage extends JFrame implements ActionListener{
 
@@ -13,11 +13,12 @@ public class AttendanceSciencePage extends JFrame implements ActionListener{
     private JButton btnMath, btnScience, btnEnglish;
     private JTable tblStudent;
     private JScrollPane tableScroll;
+	private JComboBox<String> attendanceBox;
 
     AttendanceSciencePage() {
 		
 		// Frame Settings
-        setTitle("FACULTY PORTAL - Attendance (Math)");
+        setTitle("FACULTY PORTAL - Attendance (Science)");
         setSize(1024, 764);
         setLayout(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -109,13 +110,34 @@ public class AttendanceSciencePage extends JFrame implements ActionListener{
 
 
         // Student Table 
-        String[] columns = {"STUDENT ID", "WEEK 1", "SWEEK 2", "WEEK 3", "WEEK 4", "WEEK 5"};
-        Object[][] data = new Object[0][6];
+        String[] columns = {"ID", "NAME","WEEK 1", "WEEK 2", "WEEK 3", "WEEK 4", "WEEK 5", "WEEK 6", "SWEEK 7", "WEEK 8", "WEEK 9", "WEEK 10"};
+        //Object[][] data = new Object[0][12];
 
-        tblStudent = new JTable(new DefaultTableModel(data, columns));
+		
+		//Dummy data
+		Object[][] data = {
+            {"STU-001", "Keke", "Present", "Absent", "Present", "Present", "Excused", "Present", "Present", "Present", "Present", "Present"},
+            {"STU-002", "Alex Smith", "Present", "Present", "Present", "Absent", "Present", "Present", "Present", "Excused", "Present", "Present"},
+            {"STU-003", "John Doe", "Absent", "Absent", "Present", "Present", "Present", "Present", "Present", "Present", "Present", "Present"}
+        };
+		
+		attendanceBox = new JComboBox<>();
+        attendanceBox.addItem("Present");
+        attendanceBox.addItem("Absent");
+        attendanceBox.addItem("Excused");
+		
+		tblStudent = new JTable(new DefaultTableModel(data, columns));
         tableScroll = new JScrollPane(tblStudent);
         tableScroll.setBounds(200, 100, 780, 550);
         add(tableScroll);
+		
+		//Loop for columns
+		for (int i = 2; i < columns.length; i++) {
+            TableColumn weekColumn = tblStudent.getColumnModel().getColumn(i);
+            weekColumn.setCellEditor(new DefaultCellEditor(attendanceBox));
+        }
+		
+        
 
         
 		
