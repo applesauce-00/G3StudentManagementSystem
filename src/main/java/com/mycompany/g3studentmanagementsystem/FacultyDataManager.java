@@ -14,7 +14,7 @@ public class FacultyDataManager {
     try {
 
         Connection con = DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/g3studentmgmtsystem",
+                "jdbc:mysql://localhost:3306/g3studentmanagementsystem",
                 "root",
                 ""
         );
