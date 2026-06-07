@@ -105,7 +105,15 @@ public class StudentManagerPage extends JFrame implements ActionListener {
                         "BIRTH DATE",
                         "EMAIL"
                 }
-        );
+             ) {
+               //Make all Cells non-editable
+               @Override
+               public boolean isCellEditable(int row, int column) {
+               return false;
+               }
+               };
+        
+       
 
         tblStudent = new JTable(model);
         tableScroll = new JScrollPane(tblStudent);
@@ -123,7 +131,7 @@ public class StudentManagerPage extends JFrame implements ActionListener {
         btnSignOut.addActionListener(this);
     }
 
-    private void loadStudents() {
+    public void loadStudents() {
         model.setRowCount(0);
         for (Student s : StudentDataManager.students) {
             model.addRow(new Object[]{

@@ -3,6 +3,12 @@ package com.mycompany.g3studentmanagementsystem;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class AddStudentPage extends JFrame implements ActionListener {
 
@@ -184,14 +190,49 @@ public class AddStudentPage extends JFrame implements ActionListener {
                     password
             );
 
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            String birthDate = sdf.format(dateChooserBirth.getDate());
+
+            char sex = (sexStr != null && sexStr.equalsIgnoreCase("Male")) ? 'M' : 'F';
+            
+            //Database Connection
+               try{
+                Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/g3studentmanagementsystem","root", "");
+            
+                String sql = "INSERT INTO students (student_id, last_name, first_name, middle_name, section, gender, birth_date, email, password)"
+                             + "VALUES (?,?,?,?,?,?,?,?,?)";
+                
+                 PreparedStatement student = con.prepareStatement(sql);
+
+                    student.setString(1, studentId);
+                    student.setString(2, lastName);
+                    student.setString(3, firstName);
+                    student.setString(4, middleName);
+                    student.setString(5, section);
+                    student.setString(6, sexStr);
+                    student.setString(7, birthDate);
+                    student.setString(8, email);
+                    student.setString(9, password);
+                    
+                    student.executeUpdate();
+                    con.close();
+           
+            Student s = new Student(studentId, lastName, firstName, middleName, section, sex, birthDate, email, password);
             StudentDataManager.addStudent(s);
 
             JOptionPane.showMessageDialog(this,
                     "Student Added Successfully!");
 
-            new StudentManagerPage().setVisible(true);
-            dispose();
-        }
+            StudentManagerPage smp = new StudentManagerPage();
+            smp.setVisible(true);
+            this.setVisible(false);
+            this.dispose();
+            
+            }catch (SQLException sqlException){
+                sqlException.printStackTrace();
+
+            }
+
 
         if (e.getSource() == btnCancel) {
             new StudentManagerPage().setVisible(true);

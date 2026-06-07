@@ -2,6 +2,10 @@ package com.mycompany.g3studentmanagementsystem;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import javax.swing.*;
 
 public class DeleteStudentPage extends JFrame implements ActionListener {
@@ -169,11 +173,32 @@ public class DeleteStudentPage extends JFrame implements ActionListener {
                             JOptionPane.ERROR_MESSAGE
                     );
                 }
+                
+                
+                try{
+                Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/g3studentmanagementsystem","root", "");
+            
+                String sql  = "DELETE FROM students WHERE student_id = ?";
+                
+                
+                 PreparedStatement student = con.prepareStatement(sql);
+
+                    student.setString(1, studentId);
+                    
+                    student.executeUpdate();
+                    con.close();
+
 
                 StudentManagerPage smp = new StudentManagerPage();
                 smp.setVisible(true);
                 this.setVisible(false);
                 this.dispose(); 
+                
+                 }catch (SQLException sqlException){
+                sqlException.printStackTrace();
+
+            }
+
             }
 
         } else if (e.getSource() == btnCancel) {
