@@ -4,7 +4,12 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import com.toedter.calendar.JDateChooser;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Date;
+import javax.swing.table.DefaultTableModel;
 
 public class EditStudentPage extends JFrame implements ActionListener {
 
@@ -13,6 +18,7 @@ public class EditStudentPage extends JFrame implements ActionListener {
     private JComboBox<String> cboSex;
     private JDateChooser dateChooserBirth;
     private JButton btnEdit, btnCancel;
+    
 
     EditStudentPage() {
 
@@ -30,7 +36,7 @@ public class EditStudentPage extends JFrame implements ActionListener {
         lblTitle.setBounds(0, 20, 674, 40);
         add(lblTitle);
 
-        // STUDENT ID
+         // STUDENT ID
         lblStudentId = new JLabel("STUDENT ID:");
         lblStudentId.setBounds(100, 100, 120, 25);
         add(lblStudentId);
@@ -92,6 +98,7 @@ public class EditStudentPage extends JFrame implements ActionListener {
         dateChooserBirth = new JDateChooser();
         dateChooserBirth.setDateFormatString("yyyy-MM-dd");
         dateChooserBirth.setBounds(250, 460, 200, 30);
+        dateChooserBirth.setDate(new Date());
         add(dateChooserBirth);
 
         // EMAIL
@@ -105,7 +112,7 @@ public class EditStudentPage extends JFrame implements ActionListener {
 
         // BUTTONS
         btnEdit = new JButton("EDIT");
-        btnEdit.setBounds(230, 700, 100, 40);
+        btnEdit.setBounds(230, 600, 100, 40);
         btnEdit.setBackground(new Color(52, 168, 235));
         btnEdit.setForeground(Color.WHITE);
         btnEdit.setFont(new Font("Arial", Font.BOLD, 14));
@@ -114,7 +121,7 @@ public class EditStudentPage extends JFrame implements ActionListener {
         add(btnEdit);
 
         btnCancel = new JButton("CANCEL");
-        btnCancel.setBounds(360, 700, 100, 40);
+        btnCancel.setBounds(360, 600, 100, 40);
         btnCancel.setBackground(new Color(224, 69, 52));
         btnCancel.setForeground(Color.WHITE);
         btnCancel.setFont(new Font("Arial", Font.BOLD, 14));
@@ -130,7 +137,7 @@ public class EditStudentPage extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
 
         if (e.getSource() == btnEdit) {
-
+            
             String studentId = txtStudentId.getText().trim();
             String lastName = txtLastName.getText().trim();
             String firstName = txtFirstName.getText().trim();
@@ -139,10 +146,10 @@ public class EditStudentPage extends JFrame implements ActionListener {
             String email = txtEmail.getText().trim();
             String sex = (String) cboSex.getSelectedItem();
             Date birthDate = dateChooserBirth.getDate();
+           
 
             // EMPTY FIELD CHECK
-            if (studentId.isEmpty() ||
-                lastName.isEmpty() ||
+            if (lastName.isEmpty() ||
                 firstName.isEmpty() ||
                 section.isEmpty() ||
                 email.isEmpty() ||
@@ -167,11 +174,43 @@ public class EditStudentPage extends JFrame implements ActionListener {
                         JOptionPane.ERROR_MESSAGE
                 );
                 return;
+            
             }
+            try{
+                Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/g3studentmanagementsystem","root", "");
+            
+                String sql = "UPDATE students SET last_name=?, first_name=?, middle_name=?, section=?, gender=?, birth_date=?, email=? WHERE student_id=?";
+                
+                PreparedStatement student = con.prepareStatement(sql);
 
-            StudentManagerPage smp = new StudentManagerPage();
-            smp.setVisible(true);
-            this.setVisible(false);
+                    student.setString(1, lastName);
+                    student.setString(2, firstName);
+                    student.setString(3, middleName);
+                    student.setString(4, section);
+                    student.setString(5, sex);
+                    student.setDate(6, new java.sql.Date(birthDate.getTime()));
+                    student.setString(7, email);
+                    student.setString(8, studentId);
+                    
+                    int rowsUpdated = student.executeUpdate();
+                    if (rowsUpdated > 0) {
+                            JOptionPane.showMessageDialog(this, "Student updated successfully!");
+                       
+                             StudentManagerPage smp = new StudentManagerPage();
+                             smp.setVisible(true);
+                             this.dispose();
+                            
+                    
+                    } else {
+                            JOptionPane.showMessageDialog(this, "No student found with ID: " + studentId);
+                    }
+            
+             }catch(SQLException sqlException){
+                sqlException.printStackTrace();
+                 
+             }
+            
+            
 
         } else if (e.getSource() == btnCancel) {
     
