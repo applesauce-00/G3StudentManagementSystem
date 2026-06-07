@@ -46,7 +46,6 @@ public class DeleteStudentPage extends JFrame implements ActionListener {
 
         dpLastName = new JLabel(student.getLastName());
         dpLastName.setBounds(250, 160, 200, 30);
-        dpLastName.setFont(new Font("Arial", Font.BOLD, 14));
         add(dpLastName);
 
         // FIRST NAME (DISPLAY ONLY)
@@ -56,7 +55,6 @@ public class DeleteStudentPage extends JFrame implements ActionListener {
 
         dpFirstName = new JLabel(student.getFirstName());
         dpFirstName.setBounds(250, 220, 200, 30);
-        dpFirstName.setFont(new Font("Arial", Font.BOLD, 14));
         add(dpFirstName);
 
         // MIDDLE NAME (DISPLAY ONLY)

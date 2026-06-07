@@ -8,8 +8,8 @@ import java.util.Date;
 
 public class EditStudentPage extends JFrame implements ActionListener {
 
-    private JLabel lblTitle, lblStudentId, lblName, lblSection, lblSex, lblBirthDate, lblEmail;
-    private JTextField txtStudentId, txtName, txtSection, txtEmail;
+    private JLabel lblTitle, lblStudentId, lblLastName, lblFirstName, lblMiddleName, lblSection, lblSex, lblBirthDate, lblEmail;
+    private JTextField txtStudentId, txtLastName, txtFirstName, txtMiddleName, txtSection, txtEmail;
     private JComboBox<String> cboSex;
     private JDateChooser dateChooserBirth;
     private JButton btnEdit, btnCancel;
@@ -39,55 +39,73 @@ public class EditStudentPage extends JFrame implements ActionListener {
         txtStudentId.setBounds(250, 100, 200, 30);
         add(txtStudentId);
 
-        // NAME
-        lblName = new JLabel("NAME:");
-        lblName.setBounds(100, 170, 120, 25);
-        add(lblName);
+        // LAST NAME
+        lblLastName = new JLabel("LAST NAME:");
+        lblLastName.setBounds(100, 160, 120, 25);
+        add(lblLastName);
 
-        txtName = new JTextField();
-        txtName.setBounds(250, 170, 200, 30);
-        add(txtName);
+        txtLastName = new JTextField();
+        txtLastName.setBounds(250, 160, 200, 30);
+        add(txtLastName);
+
+        // FIRST NAME
+        lblFirstName = new JLabel("FIRST NAME:");
+        lblFirstName.setBounds(100, 220, 120, 25);
+        add(lblFirstName);
+
+        txtFirstName = new JTextField();
+        txtFirstName.setBounds(250, 220, 200, 30);
+        add(txtFirstName);
+
+        // MIDDLE NAME
+        lblMiddleName = new JLabel("MIDDLE NAME:");
+        lblMiddleName.setBounds(100, 280, 120, 25);
+        add(lblMiddleName);
+
+        txtMiddleName = new JTextField();
+        txtMiddleName.setBounds(250, 280, 200, 30);
+        add(txtMiddleName);
 
         // SECTION
         lblSection = new JLabel("SECTION:");
-        lblSection.setBounds(100, 240, 120, 25);
+        lblSection.setBounds(100, 340, 120, 25);
         add(lblSection);
 
         txtSection = new JTextField();
-        txtSection.setBounds(250, 240, 200, 30);
+        txtSection.setBounds(250, 340, 200, 30);
         add(txtSection);
 
         // SEX
         lblSex = new JLabel("SEX:");
-        lblSex.setBounds(100, 310, 120, 25);
+        lblSex.setBounds(100, 400, 120, 25);
         add(lblSex);
 
         cboSex = new JComboBox<>(new String[]{"Male", "Female"});
-        cboSex.setBounds(250, 310, 200, 30);
+        cboSex.setBounds(250, 400, 200, 30);
         add(cboSex);
 
         // BIRTH DATE
         lblBirthDate = new JLabel("BIRTH DATE:");
-        lblBirthDate.setBounds(100, 380, 120, 25);
+        lblBirthDate.setBounds(100, 460, 120, 25);
         add(lblBirthDate);
 
         dateChooserBirth = new JDateChooser();
         dateChooserBirth.setDateFormatString("yyyy-MM-dd");
-        dateChooserBirth.setBounds(250, 380, 200, 30);
+        dateChooserBirth.setBounds(250, 460, 200, 30);
         add(dateChooserBirth);
 
         // EMAIL
         lblEmail = new JLabel("EMAIL ADDRESS:");
-        lblEmail.setBounds(100, 450, 140, 25);
+        lblEmail.setBounds(100, 520, 140, 25);
         add(lblEmail);
 
         txtEmail = new JTextField();
-        txtEmail.setBounds(250, 450, 200, 30);
+        txtEmail.setBounds(250, 520, 200, 30);
         add(txtEmail);
 
         // BUTTONS
         btnEdit = new JButton("EDIT");
-        btnEdit.setBounds(230, 650, 100, 40);
+        btnEdit.setBounds(230, 700, 100, 40);
         btnEdit.setBackground(new Color(52, 168, 235));
         btnEdit.setForeground(Color.WHITE);
         btnEdit.setFont(new Font("Arial", Font.BOLD, 14));
@@ -96,7 +114,7 @@ public class EditStudentPage extends JFrame implements ActionListener {
         add(btnEdit);
 
         btnCancel = new JButton("CANCEL");
-        btnCancel.setBounds(360, 650, 100, 40);
+        btnCancel.setBounds(360, 700, 100, 40);
         btnCancel.setBackground(new Color(224, 69, 52));
         btnCancel.setForeground(Color.WHITE);
         btnCancel.setFont(new Font("Arial", Font.BOLD, 14));
@@ -114,7 +132,9 @@ public class EditStudentPage extends JFrame implements ActionListener {
         if (e.getSource() == btnEdit) {
 
             String studentId = txtStudentId.getText().trim();
-            String name = txtName.getText().trim();
+            String lastName = txtLastName.getText().trim();
+            String firstName = txtFirstName.getText().trim();
+            String middleName = txtMiddleName.getText().trim();
             String section = txtSection.getText().trim();
             String email = txtEmail.getText().trim();
             String sex = (String) cboSex.getSelectedItem();
@@ -122,7 +142,8 @@ public class EditStudentPage extends JFrame implements ActionListener {
 
             // EMPTY FIELD CHECK
             if (studentId.isEmpty() ||
-                name.isEmpty() ||
+                lastName.isEmpty() ||
+                firstName.isEmpty() ||
                 section.isEmpty() ||
                 email.isEmpty() ||
                 sex == null ||
