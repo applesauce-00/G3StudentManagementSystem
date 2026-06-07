@@ -3,7 +3,6 @@ package com.mycompany.g3studentmanagementsystem;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import com.toedter.calendar.JDateChooser;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -13,14 +12,20 @@ import javax.swing.table.DefaultTableModel;
 
 public class EditStudentPage extends JFrame implements ActionListener {
 
-    private JLabel lblTitle, lblStudentId, lblLastName, lblFirstName, lblMiddleName, lblSection, lblSex, lblBirthDate, lblEmail;
-    private JTextField txtStudentId, txtLastName, txtFirstName, txtMiddleName, txtSection, txtEmail;
+    private JLabel lblTitle, lblStudentId, lblLastName, lblFirstName,
+            lblMiddleName, lblSection, lblSex, lblBirthDate, lblEmail;
+
+    private JTextField txtStudentId, txtLastName, txtFirstName,
+            txtMiddleName, txtSection, txtEmail;
+
     private JComboBox<String> cboSex;
-    private JDateChooser dateChooserBirth;
+
+    private BirthDatePanel birthDatePanel;
+
     private JButton btnEdit, btnCancel;
     
 
-    EditStudentPage() {
+    public EditStudentPage() {
 
         setTitle("Edit Student");
         setSize(674, 924);
@@ -95,6 +100,9 @@ public class EditStudentPage extends JFrame implements ActionListener {
         lblBirthDate.setBounds(100, 460, 120, 25);
         add(lblBirthDate);
 
+        birthDatePanel = new BirthDatePanel();
+        birthDatePanel.setBounds(250, 460, 300, 30);
+        add(birthDatePanel);
         dateChooserBirth = new JDateChooser();
         dateChooserBirth.setDateFormatString("yyyy-MM-dd");
         dateChooserBirth.setBounds(250, 460, 200, 30);
@@ -117,7 +125,6 @@ public class EditStudentPage extends JFrame implements ActionListener {
         btnEdit.setForeground(Color.WHITE);
         btnEdit.setFont(new Font("Arial", Font.BOLD, 14));
         btnEdit.setFocusPainted(false);
-        btnEdit.setBorderPainted(false);
         add(btnEdit);
 
         btnCancel = new JButton("CANCEL");
@@ -126,7 +133,6 @@ public class EditStudentPage extends JFrame implements ActionListener {
         btnCancel.setForeground(Color.WHITE);
         btnCancel.setFont(new Font("Arial", Font.BOLD, 14));
         btnCancel.setFocusPainted(false);
-        btnCancel.setBorderPainted(false);
         add(btnCancel);
 
         btnEdit.addActionListener(this);
@@ -166,14 +172,9 @@ public class EditStudentPage extends JFrame implements ActionListener {
                 return;
             }
 
-            // EMAIL VALIDATION
             if (!email.contains("@")) {
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Invalid email address! Must contain '@'",
-                        "Email Error",
-                        JOptionPane.ERROR_MESSAGE
-                );
+                JOptionPane.showMessageDialog(this,
+                        "Invalid email address!");
                 return;
             
             }
@@ -227,6 +228,4 @@ public class EditStudentPage extends JFrame implements ActionListener {
         smp.setVisible(true);      
         this.setVisible(false);
     }
-	}
-}
 }
