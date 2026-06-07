@@ -3,18 +3,22 @@ package com.mycompany.g3studentmanagementsystem;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import com.toedter.calendar.JDateChooser;
-import java.util.Date;
 
 public class EditStudentPage extends JFrame implements ActionListener {
 
-    private JLabel lblTitle, lblStudentId, lblLastName, lblFirstName, lblMiddleName, lblSection, lblSex, lblBirthDate, lblEmail;
-    private JTextField txtStudentId, txtLastName, txtFirstName, txtMiddleName, txtSection, txtEmail;
+    private JLabel lblTitle, lblStudentId, lblLastName, lblFirstName,
+            lblMiddleName, lblSection, lblSex, lblBirthDate, lblEmail;
+
+    private JTextField txtStudentId, txtLastName, txtFirstName,
+            txtMiddleName, txtSection, txtEmail;
+
     private JComboBox<String> cboSex;
-    private JDateChooser dateChooserBirth;
+
+    private BirthDatePanel birthDatePanel;
+
     private JButton btnEdit, btnCancel;
 
-    EditStudentPage() {
+    public EditStudentPage() {
 
         setTitle("Edit Student");
         setSize(674, 924);
@@ -89,10 +93,9 @@ public class EditStudentPage extends JFrame implements ActionListener {
         lblBirthDate.setBounds(100, 460, 120, 25);
         add(lblBirthDate);
 
-        dateChooserBirth = new JDateChooser();
-        dateChooserBirth.setDateFormatString("yyyy-MM-dd");
-        dateChooserBirth.setBounds(250, 460, 200, 30);
-        add(dateChooserBirth);
+        birthDatePanel = new BirthDatePanel();
+        birthDatePanel.setBounds(250, 460, 300, 30);
+        add(birthDatePanel);
 
         // EMAIL
         lblEmail = new JLabel("EMAIL ADDRESS:");
@@ -110,7 +113,6 @@ public class EditStudentPage extends JFrame implements ActionListener {
         btnEdit.setForeground(Color.WHITE);
         btnEdit.setFont(new Font("Arial", Font.BOLD, 14));
         btnEdit.setFocusPainted(false);
-        btnEdit.setBorderPainted(false);
         add(btnEdit);
 
         btnCancel = new JButton("CANCEL");
@@ -119,7 +121,6 @@ public class EditStudentPage extends JFrame implements ActionListener {
         btnCancel.setForeground(Color.WHITE);
         btnCancel.setFont(new Font("Arial", Font.BOLD, 14));
         btnCancel.setFocusPainted(false);
-        btnCancel.setBorderPainted(false);
         add(btnCancel);
 
         btnEdit.addActionListener(this);
@@ -138,55 +139,55 @@ public class EditStudentPage extends JFrame implements ActionListener {
             String section = txtSection.getText().trim();
             String email = txtEmail.getText().trim();
             String sex = (String) cboSex.getSelectedItem();
-            Date birthDate = dateChooserBirth.getDate();
 
-            // EMPTY FIELD CHECK
-            if (studentId.isEmpty() ||
-                lastName.isEmpty() ||
-                firstName.isEmpty() ||
-                section.isEmpty() ||
-                email.isEmpty() ||
-                sex == null ||
-                birthDate == null) {
+            if (studentId.isEmpty() || lastName.isEmpty() ||
+                firstName.isEmpty() || section.isEmpty() ||
+                email.isEmpty() || sex == null) {
 
-                JOptionPane.showMessageDialog(
-                        this,
-                        "All fields are required! Please fill in all information.",
-                        "Missing Information",
-                        JOptionPane.ERROR_MESSAGE
-                );
+                JOptionPane.showMessageDialog(this,
+                        "All fields are required!");
                 return;
             }
 
-            // EMAIL VALIDATION
             if (!email.contains("@")) {
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Invalid email address! Must contain '@'",
-                        "Email Error",
-                        JOptionPane.ERROR_MESSAGE
-                );
+                JOptionPane.showMessageDialog(this,
+                        "Invalid email address!");
                 return;
             }
 
-            StudentManagerPage smp = new StudentManagerPage();
-            smp.setVisible(true);
-            this.setVisible(false);
+            String birthDate = birthDatePanel.getBirthDate();
 
-        } else if (e.getSource() == btnCancel) {
-    
-    int confirmMessage = JOptionPane.showConfirmDialog(this,
-        "Are you sure you want to cancel?",
-        "Confirm", 
-        JOptionPane.YES_NO_OPTION
-    );
-        
-    if (confirmMessage == JOptionPane.YES_OPTION) {
-        
-        StudentManagerPage smp = new StudentManagerPage();
-        smp.setVisible(true);      
-        this.setVisible(false);
+            StudentDataManager.updateStudent(
+                    studentId,
+                    lastName,
+                    firstName,
+                    middleName,
+                    section,
+                    sex.charAt(0),
+                    birthDate,
+                    email
+            );
+
+            JOptionPane.showMessageDialog(this,
+                    "Student updated successfully!");
+
+            new StudentManagerPage().setVisible(true);
+            dispose();
+        }
+
+        if (e.getSource() == btnCancel) {
+
+            int confirm = JOptionPane.showConfirmDialog(
+                    this,
+                    "Cancel editing?",
+                    "Confirm",
+                    JOptionPane.YES_NO_OPTION
+            );
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                new StudentManagerPage().setVisible(true);
+                dispose();
+            }
+        }
     }
-	}
-}
 }

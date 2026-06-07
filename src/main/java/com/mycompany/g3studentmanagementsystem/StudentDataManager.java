@@ -20,6 +20,34 @@ public class StudentDataManager {
         }
         return null;
     }
+	
+	public static boolean updateStudent(String studentId,
+                                    String lastName,
+                                    String firstName,
+                                    String middleName,
+                                    String section,
+                                    char sex,
+                                    String birthDate,
+                                    String email) {
+
+		for (Student s : students) {
+
+			if (s.getId().equals(studentId)) {
+
+				s.setLastName(lastName);
+				s.setFirstName(firstName);
+				s.setMiddleName(middleName);
+				s.setSection(section);
+				s.setSex(sex);
+				s.setBirthDate(birthDate);
+				s.setEmail(email);
+
+				return true;
+			}
+		}
+
+		return false;
+	}
 
     // DELETE
     public static boolean deleteStudent(String id) {
@@ -30,4 +58,6 @@ public class StudentDataManager {
         }
         return false;
     }
+	
+	
 }
