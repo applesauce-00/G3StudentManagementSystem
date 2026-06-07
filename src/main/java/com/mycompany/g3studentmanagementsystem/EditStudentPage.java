@@ -149,7 +149,8 @@ public class EditStudentPage extends JFrame implements ActionListener {
            
 
             // EMPTY FIELD CHECK
-            if (lastName.isEmpty() ||
+            if (studentId.isEmpty()||
+                lastName.isEmpty() ||
                 firstName.isEmpty() ||
                 section.isEmpty() ||
                 email.isEmpty() ||
