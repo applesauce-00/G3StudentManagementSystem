@@ -4,8 +4,9 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.table.*;
+import java.sql.*;
 
-public class GradesManagerPage extends JFrame implements ActionListener{
+public class GradesManagerPage extends JFrame implements ActionListener {
 
     private JLabel lblIcon, lblTitle;
     private JButton btnAttendance, btnStudents, btnGrades, btnSignOut;
@@ -14,9 +15,10 @@ public class GradesManagerPage extends JFrame implements ActionListener{
     private JScrollPane tableScroll;
     private JTextField txtSearchId;
 
-    GradesManagerPage() {
-		
-		// Frame Settings
+    private DefaultTableModel model;
+
+    public GradesManagerPage() {
+
         setTitle("FACULTY PORTAL - Grades Manager");
         setSize(1024, 764);
         setLayout(null);
@@ -24,24 +26,19 @@ public class GradesManagerPage extends JFrame implements ActionListener{
         setLocationRelativeTo(null);
         getContentPane().setBackground(new Color(235, 242, 250));
 
-
-
-        // Logo
+        
         lblIcon = new JLabel("🎓");
         lblIcon.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 48));
         lblIcon.setBounds(10, 10, 60, 60);
         add(lblIcon);
 
-        // Title
+        
         lblTitle = new JLabel("FACULTY PORTAL");
         lblTitle.setFont(new Font("Arial", Font.BOLD, 22));
         lblTitle.setBounds(80, 20, 200, 40);
         add(lblTitle);
 
-		
-		
-		
-        // Top Panel
+        
         btnAttendance = new JButton("ATTENDANCE");
         btnAttendance.setBounds(300, 20, 120, 40);
         btnAttendance.setBackground(new Color(52, 168, 235));
@@ -50,137 +47,160 @@ public class GradesManagerPage extends JFrame implements ActionListener{
 
         btnStudents = new JButton("STUDENTS");
         btnStudents.setBounds(430, 20, 120, 40);
-        btnStudents.setBackground(new Color(35, 132, 189));
-		btnStudents.setBackground(new Color(52, 168, 235));
+        btnStudents.setBackground(new Color(52, 168, 235));
         btnStudents.setForeground(Color.WHITE);
         add(btnStudents);
 
         btnGrades = new JButton("GRADES");
-		btnGrades.setEnabled(false);
+        btnGrades.setEnabled(false);
         btnGrades.setBounds(560, 20, 120, 40);
         btnGrades.setBackground(new Color(52, 168, 235));
         btnGrades.setForeground(Color.WHITE);
         add(btnGrades);
 
-		
-		
-		//Sign Out
         btnSignOut = new JButton("Sign Out");
         btnSignOut.setBounds(850, 20, 120, 40);
         btnSignOut.setBackground(new Color(224, 69, 52));
         btnSignOut.setForeground(Color.WHITE);
         add(btnSignOut);
 
-		
-		
-		
-		
-		
-		
-		
-		//Side Panel
-
-        // Search Field 
-        txtSearchId = new JTextField(" Search ID...");
-        txtSearchId.setBounds(20, 100, 160, 35); 
+        
+        txtSearchId = new JTextField();
+        txtSearchId.setBounds(20, 100, 160, 35);
         add(txtSearchId);
 
-        // Search Button 
         btnSearch = new JButton("SEARCH STUDENT");
         btnSearch.setBounds(20, 140, 160, 40);
         btnSearch.setBackground(new Color(52, 168, 235));
         btnSearch.setForeground(Color.WHITE);
         add(btnSearch);
 
-
-        // Edit Button
+        
         btnEdit = new JButton("EDIT GRADES");
         btnEdit.setBounds(20, 200, 160, 40);
         btnEdit.setBackground(new Color(52, 168, 235));
         btnEdit.setForeground(Color.WHITE);
-        btnEdit.setEnabled(true);
         add(btnEdit);
-       
 
-        // Student Table 
-        String[] columns = {"STUDENT ID", "NAME", "SECTION", "MATH", "SCIENCE", "ENGLISH", "GWA", "GRADE STATUS"};
-        Object[][] data = new Object[0][8];
+        
+        String[] columns = {
+                "STUDENT ID", "NAME", "SECTION",
+                "MATH", "SCIENCE", "ENGLISH",
+                "GWA", "GRADE STATUS"
+        };
 
-        tblGrades = new JTable(new DefaultTableModel(data, columns));
+        model = new DefaultTableModel(columns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int col) {
+                return false;
+            }
+        };
+
+        tblGrades = new JTable(model);
         tableScroll = new JScrollPane(tblGrades);
         tableScroll.setBounds(200, 100, 780, 550);
         add(tableScroll);
-        
-        addStudentGrade("2024-00001-BN-0","Pedro De Guzman", "BSCPE 3-1","1.50","1.50","2.00", "1.00", "PASSED");
-		addStudentGrade("2024-00002-BN-0","Jay Saragon", "BSIT 2-1","1.50","1.50","2.00", "1.75", "PASSED");
-		addStudentGrade("2024-00003-BN-0","Manny Salonga", "BSIE 1-1","1.50","1.75","1.00", "1.00", "PASSED");
+
         
         btnAttendance.addActionListener(this);
-		btnEdit.addActionListener(this);
-		btnSearch.addActionListener(this);
-		btnSignOut.addActionListener(this);        
-		btnStudents.addActionListener(this);
+        btnStudents.addActionListener(this);
+        btnSearch.addActionListener(this);
+        btnEdit.addActionListener(this);
+        btnSignOut.addActionListener(this);
 
-
+       
+        loadGradesFromDatabase();
     }
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() == btnAttendance){               // on work
-			
-		} else if (e.getSource() == btnEdit){
-			int selectedRow = tblGrades.getSelectedRow();
+    
+    public void loadGradesFromDatabase() {
 
-                    if(selectedRow == -1){
-                    JOptionPane.showMessageDialog(this, "Please select a student first!","Error",JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                    DefaultTableModel model = (DefaultTableModel) tblGrades.getModel();
-                    GradesEditorPage gep = new GradesEditorPage(this, selectedRow, model);
-                    gep.setVisible(true);
-                    setVisible(false);
-		} else if (e.getSource() == btnSearch){
-                    String search = txtSearchId.getText().trim();
-                    DefaultTableModel model = (DefaultTableModel) tblGrades.getModel();
-                        boolean found = false;
-                for(int i = 0; i < model.getRowCount(); i++){
-                    String studentId = model.getValueAt(i, 0).toString();
-                if(studentId.equals(search)){
-                        tblGrades.setRowSelectionInterval(i, i);
-                        found = true;
-                        break;
-                    }
-                }
-                if(found){
-                    btnEdit.setEnabled(true);
-                    JOptionPane.showMessageDialog(this, "Student Found!","Information Found",JOptionPane.INFORMATION_MESSAGE);
-                } else {
-                    JOptionPane.showMessageDialog(this, "Student Not Found!","Error",JOptionPane.ERROR_MESSAGE);
+        try {
+
+            Connection con = DriverManager.getConnection(
+                    "jdbc:mysql://localhost:3306/g3studentmanagementsystem",
+                    "root",
+                    ""
+            );
+
+            Statement stmt = con.createStatement();
+
+            ResultSet rs = stmt.executeQuery("SELECT * FROM student_grades");
+
+            model.setRowCount(0);
+
+            while (rs.next()) {
+
+                model.addRow(new Object[]{
+                        rs.getString("student_id"),
+                        rs.getString("name"),
+                        rs.getString("section"),
+                        String.format("%.2f", rs.getDouble("math_grade")),
+                        String.format("%.2f", rs.getDouble("science_grade")),
+                        String.format("%.2f", rs.getDouble("english_grade")),
+                        String.format("%.2f", rs.getDouble("gwa")),
+                        rs.getString("grade_status")
+                });
             }
-		} else if (e.getSource() == btnSignOut){
-			LandingPageGUI lp = new LandingPageGUI();
-			lp.setVisible(true);
-                        dispose();
-		} else if (e.getSource() == btnStudents){
-			StudentManagerPage smp = new StudentManagerPage();
-			smp.setVisible(true);
-                        dispose();
-		} 
-            }
-        
-         public void addStudentGrade(String id, String name, String section, String math, String science, String english, String gwa, String status) {
-			DefaultTableModel model = (DefaultTableModel) tblGrades.getModel();
-			model.addRow(new Object[]{
-				id,
-				name,
-				section,
-				math,
-				science,
-				english,
-				gwa,
-				status
-    });
-}
+
+            con.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     
+    @Override
+    public void actionPerformed(ActionEvent e) {
+
+        if (e.getSource() == btnEdit) {
+
+            int selectedRow = tblGrades.getSelectedRow();
+
+            if (selectedRow == -1) {
+                JOptionPane.showMessageDialog(this, "Select a student first!");
+                return;
+            }
+
+            GradesEditorPage gep =
+                    new GradesEditorPage(this, selectedRow, model);
+
+            gep.setVisible(true);
+            setVisible(false);
+        }
+
+        else if (e.getSource() == btnSearch) {
+
+            String search = txtSearchId.getText().trim();
+
+            boolean found = false;
+
+            for (int i = 0; i < model.getRowCount(); i++) {
+
+                if (model.getValueAt(i, 0).toString().equals(search)) {
+
+                    tblGrades.setRowSelectionInterval(i, i);
+                    found = true;
+                    break;
+                }
+            }
+
+            if (found) {
+                JOptionPane.showMessageDialog(this, "Student Found!");
+            } else {
+                JOptionPane.showMessageDialog(this, "Student Not Found!");
+            }
+        }
+
+        else if (e.getSource() == btnStudents) {
+            new StudentManagerPage().setVisible(true);
+            dispose();
+        }
+
+        else if (e.getSource() == btnSignOut) {
+            new LandingPageGUI().setVisible(true);
+            dispose();
+        }
+    }
 }
