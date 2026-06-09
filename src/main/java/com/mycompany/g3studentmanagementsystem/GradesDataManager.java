@@ -1,45 +1,69 @@
 package com.mycompany.g3studentmanagementsystem;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import com.mycompany.g3studentmanagementsystem.databaseconnection.ConnectionString;
 
 public class GradesDataManager {
 
     public static boolean updateGrade(
             String studentId,
+            String name,  
+            String section,   
             double math,
             double science,
             double english,
             double gwa,
             String status) {
 
-        try {
+        String checkSql = "SELECT COUNT(*) FROM student_grades WHERE student_id = ?";
+        
+        // UPDATE - only updates fields that can change
+        String updateSql = "UPDATE student_grades " +
+                           "SET math_grade=?, science_grade=?, english_grade=?, gwa=?, grade_status=? " +
+                           "WHERE student_id=?";
+                           
+        // INSERT -  eincludes name and section so database constraints don't break
+        String insertSql = "INSERT INTO student_grades (math_grade, science_grade, english_grade, gwa, grade_status, student_id, name, section) " +
+                           "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-            Connection con = DriverManager.getConnection(
-                    "jdbc:mysql://localhost:3306/g3studentmanagementsystem",
-                    "root",
-                    ""
-            );
+        try (Connection con = ConnectionString.getConnection()) {
+            
+            boolean recordExists = false;
+            
+            try (PreparedStatement psCheck = con.prepareStatement(checkSql)) {
+                psCheck.setString(1, studentId);
+                try (ResultSet rs = psCheck.executeQuery()) {
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        recordExists = true;
+                    }
+                }
+            }
 
-            PreparedStatement ps = con.prepareStatement(
-                    "UPDATE student_grades " +
-                    "SET math_grade=?, science_grade=?, english_grade=?, gwa=?, grade_status=? " +
-                    "WHERE student_id=?"
-            );
+            String finalSql = recordExists ? updateSql : insertSql;
 
-            ps.setDouble(1, math);
-            ps.setDouble(2, science);
-            ps.setDouble(3, english);
-            ps.setDouble(4, gwa);
-            ps.setString(5, status);
-            ps.setString(6, studentId);
+            try (PreparedStatement ps = con.prepareStatement(finalSql)) {
+                
+                ps.setDouble(1, math);
+                ps.setDouble(2, science);
+                ps.setDouble(3, english);
+                ps.setDouble(4, gwa);
+                ps.setString(5, status);
+                ps.setString(6, studentId);
 
-            int rows = ps.executeUpdate();
+                // If it's a brand new record, fill the extra name & section slots
+                if (!recordExists) {
+                    ps.setString(7, name);
+                    ps.setString(8, section);
+                }
 
-            con.close();
+                int rows = ps.executeUpdate();
+                return rows > 0;
+            }
 
-            return rows > 0;
-
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }

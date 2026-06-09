@@ -1,5 +1,6 @@
 package com.mycompany.g3studentmanagementsystem;
 
+import com.mycompany.g3studentmanagementsystem.databaseconnection.ConnectionString;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -114,26 +115,29 @@ public class GradesManagerPage extends JFrame implements ActionListener {
 
     
     public void loadGradesFromDatabase() {
+        // Uses a LEFT JOIN to gather students master list combined with grades data rows
+        // IF a student has no grade row yet, COALESCE will fill the cell
+        String sql = "SELECT s.student_id, " +
+                     "       CONCAT(s.last_name, ', ', s.first_name) AS full_name, " +
+                     "       s.section, " +
+                     "       COALESCE(g.math_grade, 0.0) AS math_grade, " +
+                     "       COALESCE(g.science_grade, 0.0) AS science_grade, " +
+                     "       COALESCE(g.english_grade, 0.0) AS english_grade, " +
+                     "       COALESCE(g.gwa, 0.0) AS gwa, " +
+                     "       COALESCE(g.grade_status, 'PENDING') AS grade_status " +
+                     "FROM students s " +
+                     "LEFT JOIN student_grades g ON s.student_id = g.student_id";
 
-        try {
-
-            Connection con = DriverManager.getConnection(
-                    "jdbc:mysql://localhost:3306/g3studentmanagementsystem",
-                    "root",
-                    ""
-            );
-
-            Statement stmt = con.createStatement();
-
-            ResultSet rs = stmt.executeQuery("SELECT * FROM student_grades");
+        try (Connection con = ConnectionString.getConnection();
+             Statement stmt = con.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
 
             model.setRowCount(0);
 
             while (rs.next()) {
-
                 model.addRow(new Object[]{
                         rs.getString("student_id"),
-                        rs.getString("name"),
+                        rs.getString("full_name"),
                         rs.getString("section"),
                         String.format("%.2f", rs.getDouble("math_grade")),
                         String.format("%.2f", rs.getDouble("science_grade")),
@@ -143,10 +147,10 @@ public class GradesManagerPage extends JFrame implements ActionListener {
                 });
             }
 
-            con.close();
-
         } catch (Exception e) {
             e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error loading records from database: " + e.getMessage(), 
+                    "Database Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -196,6 +200,11 @@ public class GradesManagerPage extends JFrame implements ActionListener {
         else if (e.getSource() == btnStudents) {
             new StudentManagerPage().setVisible(true);
             dispose();
+        }
+		else if (e.getSource() == btnAttendance) {
+            AttendanceEnglishPage aep = new AttendanceEnglishPage();
+            aep.setVisible(true);
+            this.setVisible(false);
         }
 
         else if (e.getSource() == btnSignOut) {

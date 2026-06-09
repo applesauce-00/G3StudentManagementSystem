@@ -1,6 +1,7 @@
 package com.mycompany.g3studentmanagementsystem;
 
 import com.mycompany.g3studentmanagementsystem.attendancedatamanager.AttendanceDataManager;
+import com.mycompany.g3studentmanagementsystem.attendancedatamanager.TableandDataLogic;
 import com.mycompany.g3studentmanagementsystem.databaseconnection.ConnectionString;
 import java.awt.*;
 import java.awt.event.*;
@@ -28,19 +29,16 @@ public class AttendanceSciencePage extends JFrame implements ActionListener {
         setLocationRelativeTo(null);
         getContentPane().setBackground(new Color(235, 242, 250));
 
-        
-        lblIcon = new JLabel("");
+        lblIcon = new JLabel("🎓"); // Added logo icon matching the other layouts
         lblIcon.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 48));
         lblIcon.setBounds(10, 10, 60, 60);
         add(lblIcon);
 
-       
         lblTitle = new JLabel("FACULTY PORTAL");
         lblTitle.setFont(new Font("Arial", Font.BOLD, 22));
         lblTitle.setBounds(80, 20, 200, 40);
         add(lblTitle);
 
-        
         btnAttendance = new JButton("ATTENDANCE");
         btnAttendance.setEnabled(false);
         btnAttendance.setBounds(300, 20, 120, 40);
@@ -60,14 +58,12 @@ public class AttendanceSciencePage extends JFrame implements ActionListener {
         btnGrades.setForeground(Color.WHITE);
         add(btnGrades);
 
-        
         btnSignOut = new JButton("Sign Out");
         btnSignOut.setBounds(850, 20, 120, 40);
         btnSignOut.setBackground(new Color(224, 69, 52));
         btnSignOut.setForeground(Color.WHITE);
         add(btnSignOut);
 
-        
         lblSubject = new JLabel("SUBJECTS");
         lblSubject.setFont(new Font("Arial", Font.BOLD, 18));
         lblSubject.setBounds(40, 90, 200, 40);
@@ -79,7 +75,6 @@ public class AttendanceSciencePage extends JFrame implements ActionListener {
         btnMath.setForeground(Color.WHITE);
         add(btnMath);
 
-        
         btnScience = new JButton("SCIENCE");
         btnScience.setEnabled(false);
         btnScience.setBounds(20, 200, 160, 40);
@@ -93,7 +88,6 @@ public class AttendanceSciencePage extends JFrame implements ActionListener {
         btnEnglish.setForeground(Color.WHITE);
         add(btnEnglish);
 
-        
         btnSave = new JButton("SAVE CHANGES");
         btnSave.setBounds(20, 310, 160, 40);
         btnSave.setBackground(new Color(46, 204, 113));
@@ -101,65 +95,41 @@ public class AttendanceSciencePage extends JFrame implements ActionListener {
         btnSave.setFont(new Font("Arial", Font.BOLD, 12));
         add(btnSave);
 
-        
         attendanceBox = new JComboBox<>();
-        attendanceBox.addItem("Present");
         attendanceBox.addItem("Absent");
+        attendanceBox.addItem("Present");
         attendanceBox.addItem("Excused");
 
-        
         String[] columns = {"ID", "NAME", "WEEK 1", "WEEK 2", "WEEK 3", "WEEK 4", "WEEK 5", "WEEK 6", "WEEK 7", "WEEK 8", "WEEK 9", "WEEK 10"};
-        tableModel = new DefaultTableModel(null, columns);
+        
+        // Only dropdown is editable
+        tableModel = new DefaultTableModel(null, columns) {
+    @Override
+    public boolean isCellEditable(int row, int column) { return column >= 2; }
+        };
+
         tblStudent = new JTable(tableModel);
         tableScroll = new JScrollPane(tblStudent);
         tableScroll.setBounds(200, 100, 780, 550);
         add(tableScroll);
 
-        
-        for (int i = 2; i < columns.length; i++) {
-            TableColumn weekColumn = tblStudent.getColumnModel().getColumn(i);
-            weekColumn.setCellEditor(new DefaultCellEditor(attendanceBox));
-        }
+        // Use the Helper to configure the table and load data
+        TableandDataLogic.setupAttendanceTable(tblStudent, tableModel, attendanceBox);
+        TableandDataLogic.loadData(tableModel, "Science", this);
 
-        
-        btnMath.addActionListener(this);
-        btnEnglish.addActionListener(this);        
+        btnMath.addActionListener(this);		
+		btnScience.addActionListener(this);
+        btnEnglish.addActionListener(this);
         btnStudents.addActionListener(this);
         btnGrades.addActionListener(this);
         btnSignOut.addActionListener(this);
         btnSave.addActionListener(this);
-
-        
-        loadAttendanceFromDatabase();
-    }
-
-    private void loadAttendanceFromDatabase() {
-
-        boolean success = AttendanceDataManager.loadAttendance(tableModel, "Science");
-        
-        if (!success) {
-            JOptionPane.showMessageDialog(this, "Failed to load Science database records!");
-        }
-    }
-
-    private void saveAttendanceToDatabase() {
-        if (tblStudent.isEditing()) {
-            tblStudent.getCellEditor().stopCellEditing();
-        }
-
-        boolean success = AttendanceDataManager.saveAttendance(tableModel, "Science");
-        
-        if (success) {
-            JOptionPane.showMessageDialog(this, "Science Attendance saved safely to phpMyAdmin!");
-        } else {
-            JOptionPane.showMessageDialog(this, "Error while processing Science database updates.");
-        }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == btnSave) {
-            saveAttendanceToDatabase();
+            TableandDataLogic.saveData(tblStudent, tableModel, "Science", this);
         } else if (e.getSource() == btnMath) {
             AttendanceMathPage amp = new AttendanceMathPage();
             FrameSizeNavigation.navigate(this, amp);

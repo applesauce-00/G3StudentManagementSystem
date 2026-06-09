@@ -6,8 +6,6 @@ import java.sql.*;
 
 public class FacultyDataManager {
 
-    public static ArrayList<Faculty> facultyList = new ArrayList<>();
-
     public static int validateLogin(String id, String password) {
         
         String loginQuery = "SELECT * FROM faculty WHERE faculty_id=? AND password=?";

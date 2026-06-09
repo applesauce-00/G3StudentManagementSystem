@@ -1,7 +1,3 @@
-//Name: SEDORO, Kirby T.
-//Year & Section: BSIT 2-2
-//Date: 
-
 package com.mycompany.g3studentmanagementsystem;
 
 import java.awt.*;

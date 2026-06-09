@@ -47,7 +47,7 @@ public class StudentLogInPage extends JFrame implements ActionListener{
         lblId.setBounds(390, 330, 250, 20);
         add(lblId);
 
-        // Faculty ID Field
+        // Student ID Field
         txtId = new JTextField();
         txtId.setBounds(390, 355, 250, 40);
         txtId.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -98,8 +98,44 @@ public class StudentLogInPage extends JFrame implements ActionListener{
 			FrameSizeNavigation.navigate(this, lp);
 		} 
 		else if (e.getSource() == btnLogin){
-			StudentLandingPage slp = new StudentLandingPage();
-			FrameSizeNavigation.navigate(this, slp);
+			
+			String id = txtId.getText().trim();
+    String pass = new String(txtPassword.getPassword()).trim();
+
+    if (id.isEmpty() || pass.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Please fill in all fields!");
+        return;
+    }
+
+    int result = StudentDataManager.validateLogin(id, pass);
+
+    switch (result) {
+
+        case 0: // SUCCESS
+			JOptionPane.showMessageDialog(this, "Login Successful!");
+
+			StudentDataManager.loadStudentsFromDatabase();
+
+			StudentLandingPage slp = new StudentLandingPage(id); 
+			slp.setVisible(true);
+			this.dispose(); 
+			break;
+
+        case 1: // ID FOUND, WRONG PASSWORD
+            JOptionPane.showMessageDialog(this,
+                    "Incorrect password for this Student ID!",
+                    "Login Failed",
+                    JOptionPane.ERROR_MESSAGE);
+            break; 
+
+        case 2: // ID NOT FOUND
+            JOptionPane.showMessageDialog(this,
+                    "Student ID not found!",
+                    "Login Failed",
+                    JOptionPane.ERROR_MESSAGE);
+            break;
+    }
+	
 		}
 	}
 }
