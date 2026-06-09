@@ -1,32 +1,21 @@
 package com.mycompany.g3studentmanagementsystem;
 
+import com.mycompany.g3studentmanagementsystem.databaseconnection.ConnectionString;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.sql.*;
 
 public class AddStudentPage extends JFrame implements ActionListener {
 
     private JLabel lblTitle, lblStudentId, lblLastName, lblFirstName,
             lblMiddleName, lblSection, lblSex, lblBirthDate,
             lblEmail, lblPassword;
-
-    private JTextField txtStudentId, txtLastName, txtFirstName,
-            txtMiddleName, txtSection, txtEmail;
-
+    private JTextField txtStudentId, txtLastName, txtFirstName, txtMiddleName, txtSection, txtEmail;
     private JPasswordField txtPassword;
-
     private JComboBox<String> cboSex;
-
     private BirthDatePanel birthDatePanel;
-
     private JButton btnAdd, btnCancel;
-
     public AddStudentPage() {
 
         setTitle("Add Student");
@@ -157,87 +146,62 @@ public class AddStudentPage extends JFrame implements ActionListener {
             String section = txtSection.getText().trim();
             String email = txtEmail.getText().trim();
             String password = new String(txtPassword.getPassword()).trim();
-            String sex = (String) cboSex.getSelectedItem();
+            String sexStr = (String) cboSex.getSelectedItem();
 
+            // 1. Validation
             if (studentId.isEmpty() || lastName.isEmpty() ||
                 firstName.isEmpty() || section.isEmpty() ||
-                email.isEmpty() || password.isEmpty()) {
+                email.isEmpty() || password.isEmpty() || sexStr == null) {
 
-                JOptionPane.showMessageDialog(this,
-                        "Please fill all required fields!");
+                JOptionPane.showMessageDialog(this, "Please fill all required fields!");
                 return;
             }
 
             if (!email.contains("@")) {
-                JOptionPane.showMessageDialog(this,
-                    "Invalid email address! Must contain '@'");
+                JOptionPane.showMessageDialog(this, "Invalid email address! Must contain '@'");
                 return;
             }
-			
-			
 
+            // 2. Get Data from components safely
             String birthDate = birthDatePanel.getBirthDate();
+            char sexChar = (sexStr.equalsIgnoreCase("Male")) ? 'M' : 'F';
 
-            Student s = new Student(
-                    studentId,
-                    lastName,
-                    firstName,
-                    middleName,
-                    section,
-                    sex.charAt(0),
-                    birthDate,
-                    email,
-                    password
-            );
+            // 3. Database operation
+			String sql = "INSERT INTO students (student_id, last_name, first_name, middle_name, section, sex, birth_date, email, password) "
+					   + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            String birthDate = sdf.format(dateChooserBirth.getDate());
+			try (Connection con = ConnectionString.getConnection();
+				 PreparedStatement student = con.prepareStatement(sql)) {
 
-            char sex = (sexStr != null && sexStr.equalsIgnoreCase("Male")) ? 'M' : 'F';
-            
-            //Database Connection
-               try{
-                Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/g3studentmanagementsystem","root", "");
-            
-                String sql = "INSERT INTO students (student_id, last_name, first_name, middle_name, section, gender, birth_date, email, password)"
-                             + "VALUES (?,?,?,?,?,?,?,?,?)";
-                
-                 PreparedStatement student = con.prepareStatement(sql);
+				student.setString(1, studentId);
+				student.setString(2, lastName);
+				student.setString(3, firstName);
+				student.setString(4, middleName);
+				student.setString(5, section);
+				student.setString(6, String.valueOf(sexChar));
+				student.setString(7, birthDate);
+				student.setString(8, email);
+				student.setString(9, password);
 
-                    student.setString(1, studentId);
-                    student.setString(2, lastName);
-                    student.setString(3, firstName);
-                    student.setString(4, middleName);
-                    student.setString(5, section);
-                    student.setString(6, sexStr);
-                    student.setString(7, birthDate);
-                    student.setString(8, email);
-                    student.setString(9, password);
-                    
-                    student.executeUpdate();
-                    con.close();
-           
-            Student s = new Student(studentId, lastName, firstName, middleName, section, sex, birthDate, email, password);
-            StudentDataManager.addStudent(s);
+				student.executeUpdate();
 
-            JOptionPane.showMessageDialog(this,
-                    "Student Added Successfully!");
+				// 4. Update Memory Manager Class
+				Student s = new Student(studentId, lastName, firstName, middleName, section, sexChar, birthDate, email, password);
+				StudentDataManager.addStudent(s);
 
-            StudentManagerPage smp = new StudentManagerPage();
-            smp.setVisible(true);
-            this.setVisible(false);
-            this.dispose();
-            
-            }catch (SQLException sqlException){
-                sqlException.printStackTrace();
+				JOptionPane.showMessageDialog(this, "Student Added Successfully!");
 
-            }
+				new StudentManagerPage().setVisible(true);
+				this.dispose();
 
-
-        if (e.getSource() == btnCancel) {
+			} catch (SQLException sqlException) {
+				sqlException.printStackTrace();
+				JOptionPane.showMessageDialog(this, "Database Error: " + sqlException.getMessage());
+			}      
+		}
+		if (e.getSource() == btnCancel) {
             new StudentManagerPage().setVisible(true);
             dispose();
         }
-    }
+	}
 }
-

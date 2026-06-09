@@ -1,6 +1,7 @@
 package com.mycompany.g3studentmanagementsystem;
 
 import com.mycompany.g3studentmanagementsystem.attendancedatamanager.AttendanceDataManager;
+import com.mycompany.g3studentmanagementsystem.attendancedatamanager.TableandDataLogic;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -99,59 +100,40 @@ public class AttendanceEnglishPage extends JFrame implements ActionListener {
         add(btnSave);
 
         attendanceBox = new JComboBox<>();
-        attendanceBox.addItem("Present");
         attendanceBox.addItem("Absent");
+        attendanceBox.addItem("Present");
         attendanceBox.addItem("Excused");
         
         String[] columns = {"ID", "NAME", "WEEK 1", "WEEK 2", "WEEK 3", "WEEK 4", "WEEK 5", "WEEK 6", "WEEK 7", "WEEK 8", "WEEK 9", "WEEK 10"};
         
-        tableModel = new DefaultTableModel(null, columns);
+        // Only dropdown is editable
+        tableModel = new DefaultTableModel(null, columns) {
+            @Override
+    public boolean isCellEditable(int row, int column) { return column >= 2; }
+        };
+
         tblStudent = new JTable(tableModel);
         tableScroll = new JScrollPane(tblStudent);
         tableScroll.setBounds(200, 100, 780, 550);
         add(tableScroll);
-        
-        // Loop for columns
-        for (int i = 2; i < columns.length; i++) {
-            TableColumn weekColumn = tblStudent.getColumnModel().getColumn(i);
-            weekColumn.setCellEditor(new DefaultCellEditor(attendanceBox));
-        }
 
-        btnScience.addActionListener(this);
-        btnMath.addActionListener(this);        
+        // Use the Helper to configure the table and load data
+        TableandDataLogic.setupAttendanceTable(tblStudent, tableModel, attendanceBox);
+        TableandDataLogic.loadData(tableModel, "English", this);
+
+        btnMath.addActionListener(this);
+		btnScience.addActionListener(this);
+        btnEnglish.addActionListener(this);
         btnStudents.addActionListener(this);
         btnGrades.addActionListener(this);
         btnSignOut.addActionListener(this);
-        btnSave.addActionListener(this); 
-
-        // Automatically collect records upon loading screen UI
-        loadAttendanceFromDatabase();
-    }
-
-    private void loadAttendanceFromDatabase() {
-        boolean success = AttendanceDataManager.loadAttendance(tableModel, "English");
-        if (!success) {
-            JOptionPane.showMessageDialog(this, "Failed to load English database records!");
-        }
-    }
-
-    private void saveAttendanceToDatabase() {
-        if (tblStudent.isEditing()) {
-            tblStudent.getCellEditor().stopCellEditing();
-        }
-
-        boolean success = AttendanceDataManager.saveAttendance(tableModel, "English");
-        if (success) {
-            JOptionPane.showMessageDialog(this, "English Attendance saved safely to phpMyAdmin!");
-        } else {
-            JOptionPane.showMessageDialog(this, "Error while processing English database updates.");
-        }
+        btnSave.addActionListener(this);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == btnSave) { 
-            saveAttendanceToDatabase();
+            TableandDataLogic.saveData(tblStudent, tableModel, "English", this);
         } else if (e.getSource() == btnScience) {
             AttendanceSciencePage asp = new AttendanceSciencePage();
             FrameSizeNavigation.navigate(this, asp);
