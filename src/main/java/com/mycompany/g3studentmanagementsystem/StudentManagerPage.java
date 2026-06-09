@@ -155,7 +155,7 @@ public class StudentManagerPage extends JFrame implements ActionListener {
                 String email = rs.getString("email");
                 String password = rs.getString("password");
 
-                // Refill background StudentDataManager c
+                // Refill background StudentDataManager
                 Student loadedStudent = new Student(id, lastName, firstName, middleName, section, sex, birthDate, email, password);
                 StudentDataManager.addStudent(loadedStudent);
 

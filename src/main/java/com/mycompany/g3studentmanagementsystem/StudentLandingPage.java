@@ -277,7 +277,7 @@ public class StudentLandingPage extends JFrame implements ActionListener {
 	private String calculateStatus(String gradeStr) {
     try {
         double grade = Double.parseDouble(gradeStr);
-        // 0.00 is a failure, and 4.00 and above is a failure
+        // 0.00 is a FAILED, and 4.00 and above is FAILED
         if (grade == 0.00 || grade >= 4.00) {
             return "FAILED";
         }

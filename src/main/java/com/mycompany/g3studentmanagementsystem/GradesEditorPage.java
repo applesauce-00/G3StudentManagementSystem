@@ -85,7 +85,8 @@ public class GradesEditorPage extends JFrame implements ActionListener {
         };
 
         DefaultTableModel editorModel = new DefaultTableModel(columns, 0) {
-            @Override
+			
+        @Override
             public boolean isCellEditable(int row, int col) {
                 return col == 3 || col == 4 || col == 5;
             }
@@ -128,20 +129,20 @@ public class GradesEditorPage extends JFrame implements ActionListener {
 
             DefaultTableModel editorModel = (DefaultTableModel) tblGrades.getModel();
 
-            // Extract core student information safely
+            // Extract student information
             String studentId = editorModel.getValueAt(0, 0).toString();
             String name = editorModel.getValueAt(0, 1).toString();
             String section = editorModel.getValueAt(0, 2).toString();
 
             double math, science, english;
 
-            // Try to parse subject entries. Non-numeric input drops cleanly into catch block.
+            // Try to check subject entries. Non-numeric input falls into catch block
             try {
                 math = Double.parseDouble(editorModel.getValueAt(0, 3).toString());
                 science = Double.parseDouble(editorModel.getValueAt(0, 4).toString());
                 english = Double.parseDouble(editorModel.getValueAt(0, 5).toString());
                 
-                // Optional sanity check: Ensure input grades stay within rational limits (e.g., 0-100 or 1.0-5.0)
+                // Checking for unreasonable grades input
                 if (math < 0 || science < 0 || english < 0) {
                      JOptionPane.showMessageDialog(this, "Grades cannot be negative numbers!", "Validation Error", JOptionPane.WARNING_MESSAGE);
                      return;
@@ -156,7 +157,7 @@ public class GradesEditorPage extends JFrame implements ActionListener {
                 return; 
             }
 
-            // Run standard evaluation procedures (using standard Philippine grading scale 1.00 - 5.00)
+            // Run evaluation procedures
             double gwa = (math + science + english) / 3;
             String status = (gwa <= 3.0) ? "PASSED" : "FAILED";
 

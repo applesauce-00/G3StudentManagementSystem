@@ -121,14 +121,14 @@ public class StudentLogInPage extends JFrame implements ActionListener{
 			this.dispose(); 
 			break;
 
-        case 1: 
+        case 1: // ID FOUND, WRONG PASSWORD
             JOptionPane.showMessageDialog(this,
                     "Incorrect password for this Student ID!",
                     "Login Failed",
                     JOptionPane.ERROR_MESSAGE);
             break; 
 
-        case 2:
+        case 2: // ID NOT FOUND
             JOptionPane.showMessageDialog(this,
                     "Student ID not found!",
                     "Login Failed",

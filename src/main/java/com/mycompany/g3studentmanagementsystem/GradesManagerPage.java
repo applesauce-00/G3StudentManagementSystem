@@ -115,8 +115,8 @@ public class GradesManagerPage extends JFrame implements ActionListener {
 
     
     public void loadGradesFromDatabase() {
-        // Uses a LEFT JOIN to gather students master list combined with grades data rows.
-        // IF a student has no grade row yet, COALESCE substitutes clean defaults.
+        // Uses a LEFT JOIN to gather students master list combined with grades data rows
+        // IF a student has no grade row yet, COALESCE will fill the cell
         String sql = "SELECT s.student_id, " +
                      "       CONCAT(s.last_name, ', ', s.first_name) AS full_name, " +
                      "       s.section, " +

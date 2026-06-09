@@ -148,7 +148,7 @@ public class AddStudentPage extends JFrame implements ActionListener {
             String password = new String(txtPassword.getPassword()).trim();
             String sexStr = (String) cboSex.getSelectedItem();
 
-            // 1. Validation
+            // Validation
             if (studentId.isEmpty() || lastName.isEmpty() ||
                 firstName.isEmpty() || section.isEmpty() ||
                 email.isEmpty() || password.isEmpty() || sexStr == null) {
@@ -162,11 +162,11 @@ public class AddStudentPage extends JFrame implements ActionListener {
                 return;
             }
 
-            // 2. Get Data from components safely
+            // Get Data from components safely
             String birthDate = birthDatePanel.getBirthDate();
             char sexChar = (sexStr.equalsIgnoreCase("Male")) ? 'M' : 'F';
 
-            // 3. Database operation
+            // Database operation
 			String sql = "INSERT INTO students (student_id, last_name, first_name, middle_name, section, sex, birth_date, email, password) "
 					   + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -185,7 +185,7 @@ public class AddStudentPage extends JFrame implements ActionListener {
 
 				student.executeUpdate();
 
-				// 4. Update Memory Manager Class
+				// Update Memory Manager Class
 				Student s = new Student(studentId, lastName, firstName, middleName, section, sexChar, birthDate, email, password);
 				StudentDataManager.addStudent(s);
 

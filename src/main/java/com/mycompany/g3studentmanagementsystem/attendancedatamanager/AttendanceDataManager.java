@@ -6,13 +6,13 @@ import javax.swing.table.DefaultTableModel;
 
 public class AttendanceDataManager {
 
-    /**
-     * Reusable method to load records into any subject's table model.
-     * Uses a LEFT JOIN to guarantee every student shows up, even if they don't have an attendance row yet.
-     */
+
+    // Reusable method to load records into any subject's table model.
+    // Uses a LEFT JOIN to guarantee every student shows up, even if they don't have an attendance row yet.
+
     public static boolean loadAttendance(DefaultTableModel tableModel, String subjectName) {
         // Query pulls directly from the master students list, then checks for existing attendance metrics.
-        // COALESCE automatically substitutes 'Present' if no record row exists yet.
+        // COALESCE automatically fill 'Absent' if no record row exists yet.
         String query = "SELECT s.student_id, " +
                        "       CONCAT(s.last_name, ', ', s.first_name) AS full_name, " +
                        "       COALESCE(a.week_1, 'Absent') AS w1, " +
@@ -61,10 +61,9 @@ public class AttendanceDataManager {
         }
     }
 
-    /**
-     * Reusable method to save batch changes from any subject table model.
-     * Uses an INSERT ... ON DUPLICATE KEY UPDATE statement to seamlessly handle new or existing records.
-     */
+    // Reusable method to save batch changes from any subject table model.
+    // Uses an INSERT - ON DUPLICATE KEY UPDATE statement to handle new or existing records.
+			 
     public static boolean saveAttendance(DefaultTableModel tableModel, String subjectName) {
         // This query updates an existing row, OR inserts a brand new row if it's the first time saving this student's attendance.
         String query = "INSERT INTO student_attendance (student_id, student_name, subject, week_1, week_2, week_3, week_4, week_5, week_6, week_7, week_8, week_9, week_10) " +

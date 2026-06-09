@@ -1,5 +1,6 @@
 package com.mycompany.g3studentmanagementsystem;
 
+import com.mycompany.g3studentmanagementsystem.databaseconnection.ConnectionString;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -142,6 +143,7 @@ public class EditStudentPage extends JFrame implements ActionListener {
             String sex = (String) cboSex.getSelectedItem();
             String birthDate = birthDatePanel.getBirthDate();
 
+			// Checking if all fields have data
             if (studentId.isEmpty() || lastName.isEmpty() || firstName.isEmpty() ||
                 section.isEmpty() || email.isEmpty() || sex == null || birthDate.isEmpty()) {
 
@@ -154,34 +156,32 @@ public class EditStudentPage extends JFrame implements ActionListener {
                 return;
             }
 
-            try {
-                Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/g3studentmanagementsystem", "root", "");
-                String sql = "UPDATE students SET last_name=?, first_name=?, middle_name=?, section=?, sex=?, birth_date=?, email=? WHERE student_id=?";
-                PreparedStatement student = con.prepareStatement(sql);
+			try (Connection con = ConnectionString.getConnection();
+				 PreparedStatement student = con.prepareStatement(
+					 "UPDATE students SET last_name=?, first_name=?, middle_name=?, section=?, sex=?, birth_date=?, email=? WHERE student_id=?")) {
 
-                student.setString(1, lastName);
-                student.setString(2, firstName);
-                student.setString(3, middleName);
-                student.setString(4, section);
-                student.setString(5, sex);
-                student.setString(6, birthDate); 
-                student.setString(7, email);
-                student.setString(8, studentId);
-                
-                int rowsUpdated = student.executeUpdate();
-                con.close(); 
+				student.setString(1, lastName);
+				student.setString(2, firstName);
+				student.setString(3, middleName);
+				student.setString(4, section);
+				student.setString(5, sex);
+				student.setString(6, birthDate); 
+				student.setString(7, email);
+				student.setString(8, studentId);
 
-                if (rowsUpdated > 0) {
-                    JOptionPane.showMessageDialog(this, "Student updated successfully!");
-                    new StudentManagerPage().setVisible(true);
-                    this.dispose();
-                } else {
-                    JOptionPane.showMessageDialog(this, "No student found with ID: " + studentId);
-                }
-            } catch (SQLException sqlException) {
-                sqlException.printStackTrace();
-                JOptionPane.showMessageDialog(this, "Database Error: " + sqlException.getMessage());
-            }
+				int rowsUpdated = student.executeUpdate();
+
+				if (rowsUpdated > 0) {
+					JOptionPane.showMessageDialog(this, "Student updated successfully!");
+					new StudentManagerPage().setVisible(true);
+					this.dispose();
+				} else {
+					JOptionPane.showMessageDialog(this, "No student found with ID: " + studentId);
+				}
+			} catch (SQLException sqlException) {
+				sqlException.printStackTrace();
+				JOptionPane.showMessageDialog(this, "Database Error: " + sqlException.getMessage());
+			}
 
         } else if (e.getSource() == btnCancel) {
             int confirmMessage = JOptionPane.showConfirmDialog(this, "Are you sure you want to cancel?", "Confirm", JOptionPane.YES_NO_OPTION);

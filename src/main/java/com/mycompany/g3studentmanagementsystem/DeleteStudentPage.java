@@ -1,5 +1,6 @@
 package com.mycompany.g3studentmanagementsystem;
 
+import com.mycompany.g3studentmanagementsystem.databaseconnection.ConnectionString;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.Connection;
@@ -43,7 +44,7 @@ public class DeleteStudentPage extends JFrame implements ActionListener {
         txtStudentId.setEditable(false);
         add(txtStudentId);
 
-        // LAST NAME (DISPLAY ONLY)
+        // LAST NAME
         lblLastName = new JLabel("LAST NAME:");
         lblLastName.setBounds(100, 160, 120, 25);
         add(lblLastName);
@@ -52,7 +53,7 @@ public class DeleteStudentPage extends JFrame implements ActionListener {
         dpLastName.setBounds(250, 160, 200, 30);
         add(dpLastName);
 
-        // FIRST NAME (DISPLAY ONLY)
+        // FIRST NAME
         lblFirstName = new JLabel("FIRST NAME:");
         lblFirstName.setBounds(100, 220, 120, 25);
         add(lblFirstName);
@@ -61,7 +62,7 @@ public class DeleteStudentPage extends JFrame implements ActionListener {
         dpFirstName.setBounds(250, 220, 200, 30);
         add(dpFirstName);
 
-        // MIDDLE NAME (DISPLAY ONLY)
+        // MIDDLE NAME 
         lblMiddleName = new JLabel("MIDDLE NAME:");
         lblMiddleName.setBounds(100, 280, 120, 25);
         add(lblMiddleName);
@@ -132,20 +133,8 @@ public class DeleteStudentPage extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-
         if (e.getSource() == btnDelete) {
-
             String studentId = txtStudentId.getText().trim();
-
-            if (studentId.isEmpty()) {
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Student ID is required!",
-                        "Missing Information",
-                        JOptionPane.ERROR_MESSAGE
-                );
-                return;
-            }
 
             int confirm = JOptionPane.showConfirmDialog(
                     this,
@@ -156,56 +145,23 @@ public class DeleteStudentPage extends JFrame implements ActionListener {
             );
 
             if (confirm == JOptionPane.YES_OPTION) {
-                boolean isDeleted = StudentDataManager.deleteStudent(studentId);
+				
+				boolean isDeleted = StudentDataManager.deleteStudent(studentId);
 
-                if (isDeleted) {
-                    JOptionPane.showMessageDialog(
-                            this,
-                            "Student deleted successfully!",
-                            "Success",
-                            JOptionPane.INFORMATION_MESSAGE
-                    );
-                } else {
-                    JOptionPane.showMessageDialog(
-                            this,
-                            "Error: Student could not be found.",
-                            "Deletion Failed",
-                            JOptionPane.ERROR_MESSAGE
-                    );
-                }
-                
-                
-                try{
-                Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/g3studentmanagementsystem","root", "");
-            
-                String sql  = "DELETE FROM students WHERE student_id = ?";
-                
-                
-                 PreparedStatement student = con.prepareStatement(sql);
-
-                    student.setString(1, studentId);
-                    
-                    student.executeUpdate();
-                    con.close();
-
-
-                StudentManagerPage smp = new StudentManagerPage();
-                smp.setVisible(true);
-                this.setVisible(false);
-                this.dispose(); 
-                
-                 }catch (SQLException sqlException){
-                sqlException.printStackTrace();
-
-            }
-
-            }
-
+				if (isDeleted) {
+					JOptionPane.showMessageDialog(this, "Student deleted successfully!");
+					new StudentManagerPage().setVisible(true);
+					this.dispose();
+				} else {
+					JOptionPane.showMessageDialog(this, "Error: Could not delete student.", "Deletion Failed", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+			
         } else if (e.getSource() == btnCancel) {
-            StudentManagerPage smp = new StudentManagerPage();
-            smp.setVisible(true);
-            this.setVisible(false);
-            this.dispose(); 
+            new StudentManagerPage().setVisible(true);
+			this.dispose();
         }
     }
+
+    
 }

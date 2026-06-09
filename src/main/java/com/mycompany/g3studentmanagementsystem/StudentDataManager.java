@@ -50,13 +50,27 @@ public class StudentDataManager {
 
     // DELETE
     public static boolean deleteStudent(String id) {
-        Student s = findStudent(id);
-        if (s != null) {
-            students.remove(s);
+    String sql = "DELETE FROM students WHERE student_id = ?";
+    
+    try (Connection con = ConnectionString.getConnection();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+        
+        ps.setString(1, id);
+        int rowsAffected = ps.executeUpdate();
+        
+        if (rowsAffected > 0) {
+            // If the database delete worked, remove it from the local cache too
+            Student s = findStudent(id);
+            if (s != null) {
+                students.remove(s);
+            }
             return true;
-        }    
-        return false;
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+    return false;
+}
     
     // VALIDATE LOGIN
     public static int validateLogin(String id, String password) {

@@ -10,8 +10,8 @@ public class GradesDataManager {
 
     public static boolean updateGrade(
             String studentId,
-            String name,      // Added name parameter
-            String section,   // Added section parameter
+            String name,  
+            String section,   
             double math,
             double science,
             double english,
@@ -20,12 +20,12 @@ public class GradesDataManager {
 
         String checkSql = "SELECT COUNT(*) FROM student_grades WHERE student_id = ?";
         
-        // UPDATE only updates fields that can change
+        // UPDATE - only updates fields that can change
         String updateSql = "UPDATE student_grades " +
                            "SET math_grade=?, science_grade=?, english_grade=?, gwa=?, grade_status=? " +
                            "WHERE student_id=?";
                            
-        // INSERT explicitly includes name and section so database constraints don't break
+        // INSERT -  eincludes name and section so database constraints don't break
         String insertSql = "INSERT INTO student_grades (math_grade, science_grade, english_grade, gwa, grade_status, student_id, name, section) " +
                            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -45,7 +45,7 @@ public class GradesDataManager {
             String finalSql = recordExists ? updateSql : insertSql;
 
             try (PreparedStatement ps = con.prepareStatement(finalSql)) {
-                // Common parameters for both queries
+                
                 ps.setDouble(1, math);
                 ps.setDouble(2, science);
                 ps.setDouble(3, english);
