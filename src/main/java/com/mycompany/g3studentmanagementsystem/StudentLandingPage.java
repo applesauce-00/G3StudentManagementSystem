@@ -250,7 +250,18 @@ public class StudentLandingPage extends JFrame implements ActionListener {
                     else if (avg > 1.45 && avg <= 1.75) honorStatus = "Dean's List";
                     else honorStatus = "None";
 
-                    overallStatus = (eStatus.equals("FAILED") || mStatus.equals("FAILED") || sStatus.equals("FAILED")) ? "FAILED" : "PASSED";
+					
+					// Report Card Grade Status display
+                    if (eStatus.equals("PENDING") || mStatus.equals("PENDING") || sStatus.equals("PENDING")) {
+						overallStatus = "PENDING";
+					} 
+					else if (eStatus.equals("FAILED") || mStatus.equals("FAILED") || sStatus.equals("FAILED")) {
+						overallStatus = "FAILED";
+					} 
+					else {
+						overallStatus = "PASSED";
+					}
+					
                 } catch (NumberFormatException nfe) { }
             } else {
                 // If there's still no grade record, still show N/A in the grades table
@@ -276,16 +287,28 @@ public class StudentLandingPage extends JFrame implements ActionListener {
 	
 	private String calculateStatus(String gradeStr) {
     try {
+        if (gradeStr == null || gradeStr.equals("N/A") || gradeStr.trim().isEmpty()) {
+            return "PENDING";
+        }
+
         double grade = Double.parseDouble(gradeStr);
-        // 0.00 is a FAILED, and 4.00 and above is FAILED
-        if (grade == 0.00 || grade >= 4.00) {
+
+        // If not yet encoded
+        if (grade == 0.00) {
+            return "PENDING";
+        }
+
+        // Failed condition
+        if (grade >= 4.00) {
             return "FAILED";
         }
+
         return "PASSED";
+
     } catch (NumberFormatException e) {
-        return "N/A";
+        return "PENDING";
     }
-}
+	}
 
     private String getColumnSafe(ResultSet rs, String columnName) {
         try {
