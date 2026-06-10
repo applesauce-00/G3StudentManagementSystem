@@ -195,8 +195,21 @@ public class AddStudentPage extends JFrame implements ActionListener {
 				this.dispose();
 
 			} catch (SQLException sqlException) {
-				sqlException.printStackTrace();
-				JOptionPane.showMessageDialog(this, "Database Error: " + sqlException.getMessage());
+
+				// Handle duplicate primary key (student_id already exists)
+				if (sqlException.getErrorCode() == 1062) {
+					JOptionPane.showMessageDialog(
+							this,
+							"Student ID already exists! Please use a different ID.",
+							"Duplicate Entry",
+							JOptionPane.WARNING_MESSAGE
+					);
+				} else {
+					JOptionPane.showMessageDialog(
+							this,
+							"Database Error: " + sqlException.getMessage()
+					);
+				}
 			}      
 		}
 		if (e.getSource() == btnCancel) {

@@ -143,7 +143,9 @@ public class GradesEditorPage extends JFrame implements ActionListener {
                 english = Double.parseDouble(editorModel.getValueAt(0, 5).toString());
                 
                 // Checking for unreasonable grades input
-                if (math < 0 || science < 0 || english < 0) {
+                if (math < 0 || math > 5 ||
+					science < 0 || science > 5 ||
+					english < 0 || english > 5) {
                      JOptionPane.showMessageDialog(this, "Grades cannot be negative numbers!", "Validation Error", JOptionPane.WARNING_MESSAGE);
                      return;
                 }
@@ -157,10 +159,20 @@ public class GradesEditorPage extends JFrame implements ActionListener {
                 return; 
             }
 
-            // Run evaluation procedures
+            // Check grade status
             double gwa = (math + science + english) / 3;
-            String status = (gwa <= 3.0) ? "PASSED" : "FAILED";
 
+			String status;
+
+			if (math >= 4.00 || science >= 4.00 || english >= 4.00) {
+				status = "FAILED";
+			}
+			else if (gwa <= 3.00) {
+				status = "PASSED";
+			}
+			else {
+				status = "FAILED";
+			}
             // Map safe variables back into parent table model elements
             model.setValueAt(math, selectedRow, 3);
             model.setValueAt(science, selectedRow, 4);

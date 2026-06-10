@@ -18,16 +18,29 @@ public class GradesDataManager {
             double gwa,
             String status) {
 
-        String checkSql = "SELECT COUNT(*) FROM student_grades WHERE student_id = ?";
-        
-        // UPDATE - only updates fields that can change
-        String updateSql = "UPDATE student_grades " +
-                           "SET math_grade=?, science_grade=?, english_grade=?, gwa=?, grade_status=? " +
-                           "WHERE student_id=?";
-                           
-        // INSERT -  eincludes name and section so database constraints don't break
-        String insertSql = "INSERT INTO student_grades (math_grade, science_grade, english_grade, gwa, grade_status, student_id, name, section) " +
-                           "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        if (math >= 4.00 || science >= 4.00 || english >= 4.00) {
+        status = "FAILED";
+		}
+		else if (gwa <= 3.00) {
+			status = "PASSED";
+		}
+		else {
+			status = "FAILED";
+		}
+
+		String checkSql =
+				"SELECT COUNT(*) FROM student_grades WHERE student_id = ?";
+
+		String updateSql =
+				"UPDATE student_grades " +
+				"SET math_grade=?, science_grade=?, english_grade=?, gwa=?, grade_status=? " +
+				"WHERE student_id=?";
+
+		String insertSql =
+				"INSERT INTO student_grades " +
+				"(math_grade, science_grade, english_grade, gwa, grade_status, student_id, name, section) " +
+				"VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
 
         try (Connection con = ConnectionString.getConnection()) {
             
