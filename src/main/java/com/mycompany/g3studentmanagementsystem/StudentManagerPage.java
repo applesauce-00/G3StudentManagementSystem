@@ -11,16 +11,15 @@ public class StudentManagerPage extends JFrame implements ActionListener {
 
     private JLabel lblIcon, lblTitle;
     private JButton btnAttendance, btnStudents, btnGrades, btnSignOut;
-    private JButton btnSearch, btnAdd, btnEdit, btnDelete;
+    private JButton btnSearch, btnAdd, btnEdit, btnDelete, btnInactive;
     private JTable tblStudent;
     private JScrollPane tableScroll;
-    private JTextField txtSearchName; // renamed from txtSearchId
+    private JTextField txtSearchName;
 
     private DefaultTableModel model;
 
     public StudentManagerPage() {
 
-        // FRAME SETTINGS
         setTitle("FACULTY PORTAL - Student Manager");
         setSize(1024, 764);
         setLayout(null);
@@ -28,19 +27,16 @@ public class StudentManagerPage extends JFrame implements ActionListener {
         setLocationRelativeTo(null);
         getContentPane().setBackground(new Color(235, 242, 250));
 
-        // ICON
         lblIcon = new JLabel("🎓");
         lblIcon.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 48));
         lblIcon.setBounds(10, 10, 60, 60);
         add(lblIcon);
 
-        // TITLE
         lblTitle = new JLabel("FACULTY PORTAL");
         lblTitle.setFont(new Font("Arial", Font.BOLD, 22));
         lblTitle.setBounds(80, 20, 200, 40);
         add(lblTitle);
 
-        // TOP NAVIGATION BUTTONS
         btnAttendance = new JButton("ATTENDANCE");
         btnAttendance.setBounds(300, 20, 120, 40);
         btnAttendance.setBackground(new Color(52, 168, 235));
@@ -66,7 +62,6 @@ public class StudentManagerPage extends JFrame implements ActionListener {
         btnSignOut.setForeground(Color.WHITE);
         add(btnSignOut);
 
-        // LEFT BAR CONTROL COMPONENT
         txtSearchName = new JTextField();
         txtSearchName.setToolTipText("Search by last name");
         txtSearchName.setBounds(20, 100, 160, 35);
@@ -96,11 +91,17 @@ public class StudentManagerPage extends JFrame implements ActionListener {
         btnDelete.setForeground(Color.WHITE);
         add(btnDelete);
 
-        // Table columns — no Student ID shown
+        // Button to open Inactive Students list
+        btnInactive = new JButton("INACTIVE LIST");
+        btnInactive.setBounds(20, 360, 160, 40);
+        btnInactive.setBackground(new Color(150, 150, 150));
+        btnInactive.setForeground(Color.WHITE);
+        add(btnInactive);
+
         model = new DefaultTableModel(
                 new Object[][]{},
                 new String[]{
-                        "STUDENT ID",   // hidden column at index 0 — holds ID for lookups
+                        "STUDENT ID",   // index 0 — hidden
                         "LAST NAME",
                         "FIRST NAME",
                         "MIDDLE NAME",
@@ -117,8 +118,6 @@ public class StudentManagerPage extends JFrame implements ActionListener {
         };
 
         tblStudent = new JTable(model);
-
-        // Hide the STUDENT ID column visually — still accessible via getValueAt(row, 0)
         tblStudent.getColumnModel().getColumn(0).setMinWidth(0);
         tblStudent.getColumnModel().getColumn(0).setMaxWidth(0);
         tblStudent.getColumnModel().getColumn(0).setWidth(0);
@@ -133,6 +132,7 @@ public class StudentManagerPage extends JFrame implements ActionListener {
         btnEdit.addActionListener(this);
         btnDelete.addActionListener(this);
         btnSearch.addActionListener(this);
+        btnInactive.addActionListener(this);
         btnAttendance.addActionListener(this);
         btnGrades.addActionListener(this);
         btnSignOut.addActionListener(this);
@@ -140,7 +140,8 @@ public class StudentManagerPage extends JFrame implements ActionListener {
 
     public void loadStudents() {
         model.setRowCount(0);
-        String sql = "SELECT * FROM students ORDER BY last_name ASC";
+        // Only load active students
+        String sql = "SELECT * FROM students WHERE is_active = 1 ORDER BY last_name ASC";
 
         try (Connection con = ConnectionString.getConnection();
              Statement stmt = con.createStatement();
@@ -149,78 +150,61 @@ public class StudentManagerPage extends JFrame implements ActionListener {
             StudentDataManager.students.clear();
 
             while (rs.next()) {
-                String id = rs.getString("student_id");
-                String lastName = rs.getString("last_name");
-                String firstName = rs.getString("first_name");
+                String id         = rs.getString("student_id");
+                String lastName   = rs.getString("last_name");
+                String firstName  = rs.getString("first_name");
                 String middleName = rs.getString("middle_name");
-                String section = rs.getString("section");
+                String section    = rs.getString("section");
 
                 String sexStr = rs.getString("sex");
                 char sex = (sexStr != null && !sexStr.isEmpty()) ? sexStr.charAt(0) : 'M';
 
                 String birthDate = rs.getString("birth_date");
-                String email = rs.getString("email");
-                String password = rs.getString("password");
+                String email     = rs.getString("email");
+                String password  = rs.getString("password");
 
                 Student loadedStudent = new Student(id, lastName, firstName, middleName, section, sex, birthDate, email, password);
                 StudentDataManager.addStudent(loadedStudent);
 
                 model.addRow(new Object[]{
-                        id,          // index 0 — hidden, used for lookups
-                        lastName,
-                        firstName,
-                        middleName,
-                        section,
-                        String.valueOf(sex),
-                        birthDate,
-                        email
+                        id, lastName, firstName, middleName,
+                        section, String.valueOf(sex), birthDate, email
                 });
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Failed to load students from database: " + ex.getMessage(),
+            JOptionPane.showMessageDialog(this, "Failed to load students: " + ex.getMessage(),
                     "Database Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    // Finds a student by last name (case-insensitive)
     private Student findByLastName(String lastName) {
         for (Student s : StudentDataManager.students) {
-            if (s.getLastName().equalsIgnoreCase(lastName)) {
-                return s;
-            }
+            if (s.getLastName().equalsIgnoreCase(lastName)) return s;
         }
         return null;
     }
 
-    // Gets the student ID from the hidden column 0 of the selected table row
     private String getSelectedStudentId() {
         int row = tblStudent.getSelectedRow();
-        if (row != -1) {
-            return tblStudent.getValueAt(row, 0).toString();
-        }
-        return "";
+        return (row != -1) ? tblStudent.getValueAt(row, 0).toString() : "";
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
 
         if (e.getSource() == btnAdd) {
-            AddStudentPage asp = new AddStudentPage();
-            asp.setVisible(true);
+            new AddStudentPage().setVisible(true);
             this.setVisible(false);
         }
 
         else if (e.getSource() == btnSearch) {
             String search = txtSearchName.getText().trim();
-
             if (search.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Please enter a last name to search.");
                 return;
             }
-
             boolean found = false;
-            // Search column 1 (LAST NAME)
             for (int i = 0; i < model.getRowCount(); i++) {
                 if (model.getValueAt(i, 1).toString().equalsIgnoreCase(search)) {
                     tblStudent.setRowSelectionInterval(i, i);
@@ -229,12 +213,7 @@ public class StudentManagerPage extends JFrame implements ActionListener {
                     break;
                 }
             }
-
-            if (found) {
-                JOptionPane.showMessageDialog(this, "Student found!");
-            } else {
-                JOptionPane.showMessageDialog(this, "Student not found!");
-            }
+            JOptionPane.showMessageDialog(this, found ? "Student found!" : "Student not found!");
         }
 
         else if (e.getSource() == btnEdit) {
@@ -242,12 +221,9 @@ public class StudentManagerPage extends JFrame implements ActionListener {
             Student s = null;
 
             if (!lastName.isEmpty()) {
-                // Search by typed last name
                 s = findByLastName(lastName);
             } else if (tblStudent.getSelectedRow() != -1) {
-                // Fallback: use selected row — get ID from hidden column 0
-                String id = getSelectedStudentId();
-                s = StudentDataManager.findStudent(id);
+                s = StudentDataManager.findStudent(getSelectedStudentId());
             }
 
             if (s == null) {
@@ -255,15 +231,12 @@ public class StudentManagerPage extends JFrame implements ActionListener {
                 return;
             }
 
+            // Pass is_active status — all students in this table are active (1)
             EditStudentPage esp = new EditStudentPage(
-                    s.getId(),
-                    s.getLastName(),
-                    s.getFirstName(),
-                    s.getMiddleName(),
-                    s.getSection(),
-                    String.valueOf(s.getSex()),
-                    s.getBirthDate(),
-                    s.getEmail()
+                    s.getId(), s.getLastName(), s.getFirstName(),
+                    s.getMiddleName(), s.getSection(),
+                    String.valueOf(s.getSex()), s.getBirthDate(),
+                    s.getEmail(), 1
             );
             esp.setVisible(true);
             this.setVisible(false);
@@ -274,12 +247,9 @@ public class StudentManagerPage extends JFrame implements ActionListener {
             Student s = null;
 
             if (!lastName.isEmpty()) {
-                // Search by typed last name
                 s = findByLastName(lastName);
             } else if (tblStudent.getSelectedRow() != -1) {
-                // Fallback: use selected row — get ID from hidden column 0
-                String id = getSelectedStudentId();
-                s = StudentDataManager.findStudent(id);
+                s = StudentDataManager.findStudent(getSelectedStudentId());
             }
 
             if (s == null) {
@@ -287,26 +257,27 @@ public class StudentManagerPage extends JFrame implements ActionListener {
                 return;
             }
 
-            DeleteStudentPage dsp = new DeleteStudentPage(s);
-            dsp.setVisible(true);
+            new DeleteStudentPage(s).setVisible(true);
+            this.setVisible(false);
+        }
+
+        else if (e.getSource() == btnInactive) {
+            new InactiveStudentsPage().setVisible(true);
             this.setVisible(false);
         }
 
         else if (e.getSource() == btnAttendance) {
-            AttendanceEnglishPage aep = new AttendanceEnglishPage();
-            aep.setVisible(true);
+            new AttendanceEnglishPage().setVisible(true);
             this.setVisible(false);
         }
 
         else if (e.getSource() == btnGrades) {
-            GradesManagerPage gsp = new GradesManagerPage();
-            gsp.setVisible(true);
+            new GradesManagerPage().setVisible(true);
             this.setVisible(false);
         }
 
         else if (e.getSource() == btnSignOut) {
-            LandingPageGUI lp = new LandingPageGUI();
-            lp.setVisible(true);
+            new LandingPageGUI().setVisible(true);
             this.setVisible(false);
         }
     }

@@ -11,9 +11,11 @@ public class Student {
     private String birthDate;
     private String email;
     private String password;
+	private int isActive;
 
     public Student(String id, String lastName, String firstName, String middleName,
-                   String section, char sex, String birthDate, String email, String password) {
+                   String section, char sex, String birthDate, String email, String password//, int isActive
+	) {
 
         this.id = id;
         this.lastName = lastName;
@@ -24,6 +26,7 @@ public class Student {
         this.birthDate = birthDate;
         this.email = email;
         this.password = password;
+		//this.isActive = isActive;
     }
 
     // GETTERS
@@ -36,6 +39,7 @@ public class Student {
     public String getBirthDate() { return birthDate; }
     public String getEmail() { return email; }
     public String getPassword() { return password; }
+	//public int getIsActive() { return isActive; }
 
     // SETTERS
     public void setLastName(String lastName) { this.lastName = lastName; }
@@ -46,5 +50,6 @@ public class Student {
     public void setBirthDate(String birthDate) { this.birthDate = birthDate; }
     public void setEmail(String email) { this.email = email; }
     public void setPassword(String password) { this.password = password; }
+	//public void getIsActive(int isActive) { this.isActive = isActive; }
 }
 

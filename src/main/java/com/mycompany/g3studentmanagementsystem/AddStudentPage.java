@@ -10,13 +10,17 @@ public class AddStudentPage extends JFrame implements ActionListener {
 
     private JLabel lblTitle, lblStudentId, lblLastName, lblFirstName,
             lblMiddleName, lblSection, lblSex, lblBirthDate,
-            lblEmail, lblPassword;
+            lblEmail, lblPassword, lblStatus;
+
     private JTextField txtStudentId, txtLastName, txtFirstName, txtMiddleName, txtSection, txtEmail;
     private JPasswordField txtPassword;
     private JComboBox<String> cboSex;
     private BirthDatePanel birthDatePanel;
+
+    private JCheckBox chkActive;
+
     private JButton btnAdd, btnCancel;
-	
+
     public AddStudentPage() {
 
         setTitle("Add Student");
@@ -39,10 +43,10 @@ public class AddStudentPage extends JFrame implements ActionListener {
         add(lblStudentId);
 
         txtStudentId = new JTextField();
-		txtStudentId.setBounds(250, 100, 200, 30);
-		txtStudentId.setEditable(false);
-		txtStudentId.setText(generateRandomStudentId()); 
-		add(txtStudentId);
+        txtStudentId.setBounds(250, 100, 200, 30);
+        txtStudentId.setEditable(false);
+        txtStudentId.setText(generateRandomStudentId());
+        add(txtStudentId);
 
         // LAST NAME
         lblLastName = new JLabel("LAST NAME:");
@@ -116,9 +120,21 @@ public class AddStudentPage extends JFrame implements ActionListener {
         txtPassword.setBounds(250, 580, 200, 30);
         add(txtPassword);
 
+        // STATUS CHECKBOX
+        lblStatus = new JLabel("STATUS:");
+        lblStatus.setBounds(100, 640, 120, 25);
+        add(lblStatus);
+
+        chkActive = new JCheckBox("Active Student");
+        chkActive.setSelected(true);
+        chkActive.setBackground(new Color(235, 242, 250));
+        chkActive.setFont(new Font("Arial", Font.PLAIN, 13));
+        chkActive.setBounds(250, 638, 200, 30);
+        add(chkActive);
+
         // BUTTONS
         btnAdd = new JButton("ADD");
-        btnAdd.setBounds(230, 700, 100, 40);
+        btnAdd.setBounds(230, 750, 100, 40);
         btnAdd.setBackground(new Color(52, 168, 235));
         btnAdd.setForeground(Color.WHITE);
         btnAdd.setFont(new Font("Arial", Font.BOLD, 14));
@@ -126,7 +142,7 @@ public class AddStudentPage extends JFrame implements ActionListener {
         add(btnAdd);
 
         btnCancel = new JButton("CANCEL");
-        btnCancel.setBounds(360, 700, 100, 40);
+        btnCancel.setBounds(360, 750, 100, 40);
         btnCancel.setBackground(new Color(224, 69, 52));
         btnCancel.setForeground(Color.WHITE);
         btnCancel.setFont(new Font("Arial", Font.BOLD, 14));
@@ -136,12 +152,12 @@ public class AddStudentPage extends JFrame implements ActionListener {
         btnAdd.addActionListener(this);
         btnCancel.addActionListener(this);
     }
-	
-	private String generateRandomStudentId() {
-		String prefix = "STU-"; 
-		int randomNum = (int) (Math.random() * 900000) + 100000;
-		return prefix + randomNum;
-	}
+
+    private String generateRandomStudentId() {
+        String prefix = "STU-";
+        int randomNum = (int) (Math.random() * 900000) + 100000;
+        return prefix + randomNum;
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -157,10 +173,12 @@ public class AddStudentPage extends JFrame implements ActionListener {
             String password = new String(txtPassword.getPassword()).trim();
             String sexStr = (String) cboSex.getSelectedItem();
 
+            int isActive = chkActive.isSelected() ? 1 : 0;
+
             // Validation
-            if (studentId.isEmpty() || lastName.isEmpty() ||
-                firstName.isEmpty() || section.isEmpty() ||
-                email.isEmpty() || password.isEmpty() || sexStr == null) {
+            if (studentId.isEmpty() || lastName.isEmpty()
+                    || firstName.isEmpty() || section.isEmpty()
+                    || email.isEmpty() || password.isEmpty() || sexStr == null) {
 
                 JOptionPane.showMessageDialog(this, "Please fill all required fields!");
                 return;
@@ -171,59 +189,57 @@ public class AddStudentPage extends JFrame implements ActionListener {
                 return;
             }
 
-            // Get Data from components safely
             String birthDate = birthDatePanel.getBirthDate();
             char sexChar = (sexStr.equalsIgnoreCase("Male")) ? 'M' : 'F';
 
-            // Database operation
-			String sql = "INSERT INTO students (student_id, last_name, first_name, middle_name, section, sex, birth_date, email, password) "
-					   + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO students (student_id, last_name, first_name, middle_name, section, sex, birth_date, email, password, is_active) "
+                       + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-			try (Connection con = ConnectionString.getConnection();
-				 PreparedStatement student = con.prepareStatement(sql)) {
+            try (Connection con = ConnectionString.getConnection();
+                 PreparedStatement student = con.prepareStatement(sql)) {
 
-				student.setString(1, studentId);
-				student.setString(2, lastName);
-				student.setString(3, firstName);
-				student.setString(4, middleName);
-				student.setString(5, section);
-				student.setString(6, String.valueOf(sexChar));
-				student.setString(7, birthDate);
-				student.setString(8, email);
-				student.setString(9, password);
+                student.setString(1, studentId);
+                student.setString(2, lastName);
+                student.setString(3, firstName);
+                student.setString(4, middleName);
+                student.setString(5, section);
+                student.setString(6, String.valueOf(sexChar));
+                student.setString(7, birthDate);
+                student.setString(8, email);
+                student.setString(9, password);
+                student.setInt(10, isActive);
 
-				student.executeUpdate();
+                student.executeUpdate();
 
-				// Update Memory Manager Class
-				Student s = new Student(studentId, lastName, firstName, middleName, section, sexChar, birthDate, email, password);
-				StudentDataManager.addStudent(s);
+                Student s = new Student(
+                        studentId, lastName, firstName, middleName,
+                        section, sexChar, birthDate, email, password
+                );
 
-				JOptionPane.showMessageDialog(this, "Student Added Successfully!");
+                StudentDataManager.addStudent(s);
 
-				new StudentManagerPage().setVisible(true);
-				this.dispose();
+                JOptionPane.showMessageDialog(this, "Student Added Successfully!");
 
-			} catch (SQLException sqlException) {
+                new StudentManagerPage().setVisible(true);
+                this.dispose();
 
-				// Handle duplicate primary key (student_id already exists)
-				if (sqlException.getErrorCode() == 1062) {
-					JOptionPane.showMessageDialog(
-							this,
-							"Student ID already exists! Please use a different ID.",
-							"Duplicate Entry",
-							JOptionPane.WARNING_MESSAGE
-					);
-				} else {
-					JOptionPane.showMessageDialog(
-							this,
-							"Database Error: " + sqlException.getMessage()
-					);
-				}
-			}      
-		}
-		if (e.getSource() == btnCancel) {
+            } catch (SQLException sqlException) {
+
+                if (sqlException.getErrorCode() == 1062) {
+                    JOptionPane.showMessageDialog(this,
+                            "Student ID already exists!",
+                            "Duplicate Entry",
+                            JOptionPane.WARNING_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(this,
+                            "Database Error: " + sqlException.getMessage());
+                }
+            }
+        }
+
+        if (e.getSource() == btnCancel) {
             new StudentManagerPage().setVisible(true);
             dispose();
         }
-	}
+    }
 }
