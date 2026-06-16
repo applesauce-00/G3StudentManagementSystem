@@ -44,4 +44,19 @@ public class FacultyDataManager {
             return 2; // Database error
         }
     }
+	
+	public static String getFacultySubject(String id) {
+    String subject = "Unknown";
+    String sql = "SELECT subject FROM faculty WHERE faculty_id = ?";
+    try (Connection con = ConnectionString.getConnection();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setString(1, id);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            subject = rs.getString("subject");
+        }
+    } catch (Exception e) { e.printStackTrace(); }
+    return subject;
+}
+	
 }

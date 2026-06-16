@@ -104,12 +104,12 @@ public class AttendanceEnglishPage extends JFrame implements ActionListener {
         attendanceBox.addItem("Present");
         attendanceBox.addItem("Excused");
         
-        String[] columns = {"ID", "NAME", "WEEK 1", "WEEK 2", "WEEK 3", "WEEK 4", "WEEK 5", "WEEK 6", "WEEK 7", "WEEK 8", "WEEK 9", "WEEK 10"};
+        String[] columns = {"NAME", "WEEK 1", "WEEK 2", "WEEK 3", "WEEK 4", "WEEK 5", "WEEK 6", "WEEK 7", "WEEK 8", "WEEK 9", "WEEK 10"};
         
         // Only dropdown is editable
         tableModel = new DefaultTableModel(null, columns) {
             @Override
-    public boolean isCellEditable(int row, int column) { return column >= 2; }
+    public boolean isCellEditable(int row, int column) { return column >= 1; }
         };
 
         tblStudent = new JTable(tableModel);

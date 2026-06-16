@@ -16,6 +16,7 @@ public class AddStudentPage extends JFrame implements ActionListener {
     private JComboBox<String> cboSex;
     private BirthDatePanel birthDatePanel;
     private JButton btnAdd, btnCancel;
+	
     public AddStudentPage() {
 
         setTitle("Add Student");
@@ -38,8 +39,10 @@ public class AddStudentPage extends JFrame implements ActionListener {
         add(lblStudentId);
 
         txtStudentId = new JTextField();
-        txtStudentId.setBounds(250, 100, 200, 30);
-        add(txtStudentId);
+		txtStudentId.setBounds(250, 100, 200, 30);
+		txtStudentId.setEditable(false);
+		txtStudentId.setText(generateRandomStudentId()); 
+		add(txtStudentId);
 
         // LAST NAME
         lblLastName = new JLabel("LAST NAME:");
@@ -133,6 +136,12 @@ public class AddStudentPage extends JFrame implements ActionListener {
         btnAdd.addActionListener(this);
         btnCancel.addActionListener(this);
     }
+	
+	private String generateRandomStudentId() {
+		String prefix = "STU-"; 
+		int randomNum = (int) (Math.random() * 900000) + 100000;
+		return prefix + randomNum;
+	}
 
     @Override
     public void actionPerformed(ActionEvent e) {

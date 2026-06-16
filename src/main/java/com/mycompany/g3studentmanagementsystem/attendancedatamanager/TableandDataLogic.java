@@ -8,7 +8,7 @@ public class TableandDataLogic {
 
     public static void setupAttendanceTable(JTable table, DefaultTableModel model, JComboBox<String> box) {
         table.setModel(model);
-        for (int i = 2; i < model.getColumnCount(); i++) {
+        for (int i = 1; i < model.getColumnCount(); i++) {
             table.getColumnModel().getColumn(i).setCellEditor(new DefaultCellEditor(box));
         }
     }

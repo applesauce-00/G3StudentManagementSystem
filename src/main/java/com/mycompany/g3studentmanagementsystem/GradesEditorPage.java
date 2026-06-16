@@ -12,7 +12,7 @@ public class GradesEditorPage extends JFrame implements ActionListener {
     private JButton btnSave, btnCancel, btnSearch;
     private JTable tblGrades;
     private JScrollPane tableScroll;
-    private JTextField txtSearchId;
+    private JTextField txtSearchName;
 
     private DefaultTableModel model;
     private GradesManagerPage parent;
@@ -56,9 +56,10 @@ public class GradesEditorPage extends JFrame implements ActionListener {
         btnGrades.setBounds(560, 20, 120, 40);
         add(btnGrades);
 
-        txtSearchId = new JTextField();
-        txtSearchId.setBounds(20, 100, 160, 35);
-        add(txtSearchId);
+        txtSearchName = new JTextField();
+        txtSearchName.setToolTipText("Search by last name");
+        txtSearchName.setBounds(20, 100, 160, 35);
+        add(txtSearchName);
 
         btnSearch = new JButton("SEARCH");
         btnSearch.setBounds(20, 140, 160, 40);
@@ -78,32 +79,45 @@ public class GradesEditorPage extends JFrame implements ActionListener {
         btnCancel.setForeground(Color.WHITE);
         add(btnCancel);
 
+        // Columns mirror GradesManagerPage exactly (index 0 = STUDENT ID hidden)
         String[] columns = {
-                "STUDENT ID", "NAME", "SECTION",
-                "MATH", "SCIENCE", "ENGLISH",
-                "GWA", "STATUS"
+                "STUDENT ID",  // index 0 — read-only, carries ID for DB update
+                "NAME",        // index 1
+                "SECTION",     // index 2
+                "MATH",        // index 3 — editable
+                "SCIENCE",     // index 4 — editable
+                "ENGLISH",     // index 5 — editable
+                "GWA",         // index 6 — auto-computed
+                "STATUS"       // index 7 — auto-computed
         };
 
         DefaultTableModel editorModel = new DefaultTableModel(columns, 0) {
-			
-        @Override
+            @Override
             public boolean isCellEditable(int row, int col) {
+                // Only MATH, SCIENCE, ENGLISH are editable
                 return col == 3 || col == 4 || col == 5;
             }
         };
 
+        // Populate editor with the selected row from parent model (indices 0–7)
         editorModel.addRow(new Object[]{
-                model.getValueAt(selectedRow, 0),
-                model.getValueAt(selectedRow, 1),
-                model.getValueAt(selectedRow, 2),
-                model.getValueAt(selectedRow, 3),
-                model.getValueAt(selectedRow, 4),
-                model.getValueAt(selectedRow, 5),
-                model.getValueAt(selectedRow, 6),
-                model.getValueAt(selectedRow, 7)
+                model.getValueAt(selectedRow, 0),  // STUDENT ID
+                model.getValueAt(selectedRow, 1),  // NAME
+                model.getValueAt(selectedRow, 2),  // SECTION
+                model.getValueAt(selectedRow, 3),  // MATH
+                model.getValueAt(selectedRow, 4),  // SCIENCE
+                model.getValueAt(selectedRow, 5),  // ENGLISH
+                model.getValueAt(selectedRow, 6),  // GWA
+                model.getValueAt(selectedRow, 7)   // STATUS
         });
 
         tblGrades = new JTable(editorModel);
+
+        // Hide STUDENT ID column — still readable via getValueAt(0, 0)
+        tblGrades.getColumnModel().getColumn(0).setMinWidth(0);
+        tblGrades.getColumnModel().getColumn(0).setMaxWidth(0);
+        tblGrades.getColumnModel().getColumn(0).setWidth(0);
+
         tableScroll = new JScrollPane(tblGrades);
         tableScroll.setBounds(200, 100, 780, 550);
         add(tableScroll);
@@ -129,58 +143,60 @@ public class GradesEditorPage extends JFrame implements ActionListener {
 
             DefaultTableModel editorModel = (DefaultTableModel) tblGrades.getModel();
 
-            // Extract student information
-            String studentId = editorModel.getValueAt(0, 0).toString();
-            String name = editorModel.getValueAt(0, 1).toString();
-            String section = editorModel.getValueAt(0, 2).toString();
+            // Read student info from editor table
+            String studentId = editorModel.getValueAt(0, 0).toString();  // hidden col 0
+            String name      = editorModel.getValueAt(0, 1).toString();
+            String section   = editorModel.getValueAt(0, 2).toString();
 
             double math, science, english;
 
-            // Try to check subject entries. Non-numeric input falls into catch block
             try {
-                math = Double.parseDouble(editorModel.getValueAt(0, 3).toString());
+                math    = Double.parseDouble(editorModel.getValueAt(0, 3).toString());
                 science = Double.parseDouble(editorModel.getValueAt(0, 4).toString());
                 english = Double.parseDouble(editorModel.getValueAt(0, 5).toString());
-                
-                // Checking for unreasonable grades input
-                if (math < 0 || math > 5 ||
-					science < 0 || science > 5 ||
-					english < 0 || english > 5) {
-                     JOptionPane.showMessageDialog(this, "Grades cannot be negative numbers!", "Validation Error", JOptionPane.WARNING_MESSAGE);
-                     return;
+
+                // Grades must be within the 1.00–5.00 Philippine grading scale
+                if (math < 1.0 || math > 5.0 ||
+                    science < 1.0 || science > 5.0 ||
+                    english < 1.0 || english > 5.0) {
+                    JOptionPane.showMessageDialog(this,
+                            "Grades must be between 1.00 and 5.00!",
+                            "Validation Error", JOptionPane.WARNING_MESSAGE);
+                    return;
                 }
-                
+
             } catch (NumberFormatException | NullPointerException ex) {
-                // Notifies the user, stops the save transaction, and preserves window state
-                JOptionPane.showMessageDialog(this, 
-                        "Invalid entry detected! Please type numeric grades only.\nLetters and special formatting characters are prohibited.", 
-                        "Input Error", 
-                        JOptionPane.ERROR_MESSAGE);
-                return; 
+                JOptionPane.showMessageDialog(this,
+                        "Invalid entry detected! Please type numeric grades only.\n" +
+                        "Letters and special formatting characters are prohibited.",
+                        "Input Error", JOptionPane.ERROR_MESSAGE);
+                return;
             }
 
-            // Check grade status
-            double gwa = (math + science + english) / 3;
+            // Auto-compute GWA and status
+            double gwa = (math + science + english) / 3.0;
 
-			String status;
+            String status;
+            if (math >= 4.00 || science >= 4.00 || english >= 4.00) {
+                status = "FAILED";
+            } else if (gwa <= 3.00) {
+                status = "PASSED";
+            } else {
+                status = "FAILED";
+            }
 
-			if (math >= 4.00 || science >= 4.00 || english >= 4.00) {
-				status = "FAILED";
-			}
-			else if (gwa <= 3.00) {
-				status = "PASSED";
-			}
-			else {
-				status = "FAILED";
-			}
-            // Map safe variables back into parent table model elements
-            model.setValueAt(math, selectedRow, 3);
-            model.setValueAt(science, selectedRow, 4);
-            model.setValueAt(english, selectedRow, 5);
-            model.setValueAt(String.format("%.2f", gwa), selectedRow, 6);
-            model.setValueAt(status, selectedRow, 7);
+            // Push computed values back into the editor table so the user sees them
+            editorModel.setValueAt(String.format("%.2f", gwa), 0, 6);
+            editorModel.setValueAt(status, 0, 7);
 
-            // Execute database validation
+            // Sync updates back into the parent GradesManagerPage table model
+            model.setValueAt(String.format("%.2f", math),    selectedRow, 3);
+            model.setValueAt(String.format("%.2f", science), selectedRow, 4);
+            model.setValueAt(String.format("%.2f", english), selectedRow, 5);
+            model.setValueAt(String.format("%.2f", gwa),     selectedRow, 6);
+            model.setValueAt(status,                          selectedRow, 7);
+
+            // Persist to database
             boolean ok = GradesDataManager.updateGrade(
                     studentId,
                     name,
@@ -198,22 +214,28 @@ public class GradesEditorPage extends JFrame implements ActionListener {
                 JOptionPane.showMessageDialog(this, "Database update failed! Check console for detailed errors.");
             }
 
-            // Reload background table values and pass visibility priority back to parent window
             parent.loadGradesFromDatabase();
             parent.setVisible(true);
             dispose();
         }
 
         else if (e.getSource() == btnSearch) {
+            String search = txtSearchName.getText().trim();
 
-            String searchId = txtSearchId.getText().trim();
-            String currentId = tblGrades.getValueAt(0, 0).toString();
+            if (search.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please enter a last name to search.");
+                return;
+            }
 
-            if (searchId.equals(currentId)) {
+            // Column 1 is NAME formatted as "LastName, FirstName"
+            String fullName = tblGrades.getValueAt(0, 1).toString();
+            String lastName = fullName.split(",")[0].trim();
+
+            if (lastName.equalsIgnoreCase(search)) {
                 tblGrades.setRowSelectionInterval(0, 0);
-                JOptionPane.showMessageDialog(this, "Student Found!");
+                JOptionPane.showMessageDialog(this, "Student found!");
             } else {
-                JOptionPane.showMessageDialog(this, "Student Not Found!");
+                JOptionPane.showMessageDialog(this, "Student not found!");
             }
         }
     }

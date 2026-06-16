@@ -14,7 +14,7 @@ public class GradesManagerPage extends JFrame implements ActionListener {
     private JButton btnSearch, btnEdit;
     private JTable tblGrades;
     private JScrollPane tableScroll;
-    private JTextField txtSearchId;
+    private JTextField txtSearchName;
 
     private DefaultTableModel model;
 
@@ -27,19 +27,16 @@ public class GradesManagerPage extends JFrame implements ActionListener {
         setLocationRelativeTo(null);
         getContentPane().setBackground(new Color(235, 242, 250));
 
-        
         lblIcon = new JLabel("🎓");
         lblIcon.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 48));
         lblIcon.setBounds(10, 10, 60, 60);
         add(lblIcon);
 
-        
         lblTitle = new JLabel("FACULTY PORTAL");
         lblTitle.setFont(new Font("Arial", Font.BOLD, 22));
         lblTitle.setBounds(80, 20, 200, 40);
         add(lblTitle);
 
-        
         btnAttendance = new JButton("ATTENDANCE");
         btnAttendance.setBounds(300, 20, 120, 40);
         btnAttendance.setBackground(new Color(52, 168, 235));
@@ -65,10 +62,10 @@ public class GradesManagerPage extends JFrame implements ActionListener {
         btnSignOut.setForeground(Color.WHITE);
         add(btnSignOut);
 
-        
-        txtSearchId = new JTextField();
-        txtSearchId.setBounds(20, 100, 160, 35);
-        add(txtSearchId);
+        txtSearchName = new JTextField();
+        txtSearchName.setToolTipText("Search by last name");
+        txtSearchName.setBounds(20, 100, 160, 35);
+        add(txtSearchName);
 
         btnSearch = new JButton("SEARCH STUDENT");
         btnSearch.setBounds(20, 140, 160, 40);
@@ -76,18 +73,22 @@ public class GradesManagerPage extends JFrame implements ActionListener {
         btnSearch.setForeground(Color.WHITE);
         add(btnSearch);
 
-        
         btnEdit = new JButton("EDIT GRADES");
         btnEdit.setBounds(20, 200, 160, 40);
         btnEdit.setBackground(new Color(52, 168, 235));
         btnEdit.setForeground(Color.WHITE);
         add(btnEdit);
 
-        
+        // STUDENT ID at index 0 is hidden — keeps ID available for DB lookups
         String[] columns = {
-                "STUDENT ID", "NAME", "SECTION",
-                "MATH", "SCIENCE", "ENGLISH",
-                "GWA", "GRADE STATUS"
+                "STUDENT ID",    // index 0 — hidden
+                "NAME",          // index 1
+                "SECTION",       // index 2
+                "MATH",          // index 3
+                "SCIENCE",       // index 4
+                "ENGLISH",       // index 5
+                "GWA",           // index 6
+                "GRADE STATUS"   // index 7
         };
 
         model = new DefaultTableModel(columns, 0) {
@@ -98,25 +99,28 @@ public class GradesManagerPage extends JFrame implements ActionListener {
         };
 
         tblGrades = new JTable(model);
+        tblGrades.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tblGrades.setRowSelectionAllowed(true);
+
+        // Hide STUDENT ID column visually — still readable via getValueAt(row, 0)
+        tblGrades.getColumnModel().getColumn(0).setMinWidth(0);
+        tblGrades.getColumnModel().getColumn(0).setMaxWidth(0);
+        tblGrades.getColumnModel().getColumn(0).setWidth(0);
+
         tableScroll = new JScrollPane(tblGrades);
         tableScroll.setBounds(200, 100, 780, 550);
         add(tableScroll);
 
-        
         btnAttendance.addActionListener(this);
         btnStudents.addActionListener(this);
         btnSearch.addActionListener(this);
         btnEdit.addActionListener(this);
         btnSignOut.addActionListener(this);
 
-       
         loadGradesFromDatabase();
     }
 
-    
     public void loadGradesFromDatabase() {
-        // Uses a LEFT JOIN to gather students master list combined with grades data rows
-        // IF a student has no grade row yet, COALESCE will fill the cell
         String sql = "SELECT s.student_id, " +
                      "       CONCAT(s.last_name, ', ', s.first_name) AS full_name, " +
                      "       s.section, " +
@@ -126,7 +130,8 @@ public class GradesManagerPage extends JFrame implements ActionListener {
                      "       COALESCE(g.gwa, 0.0) AS gwa, " +
                      "       COALESCE(g.grade_status, 'PENDING') AS grade_status " +
                      "FROM students s " +
-                     "LEFT JOIN student_grades g ON s.student_id = g.student_id";
+                     "LEFT JOIN student_grades g ON s.student_id = g.student_id " +
+                     "ORDER BY s.last_name ASC";
 
         try (Connection con = ConnectionString.getConnection();
              Statement stmt = con.createStatement();
@@ -136,64 +141,67 @@ public class GradesManagerPage extends JFrame implements ActionListener {
 
             while (rs.next()) {
                 model.addRow(new Object[]{
-                        rs.getString("student_id"),
-                        rs.getString("full_name"),
-                        rs.getString("section"),
-                        String.format("%.2f", rs.getDouble("math_grade")),
-                        String.format("%.2f", rs.getDouble("science_grade")),
-                        String.format("%.2f", rs.getDouble("english_grade")),
-                        String.format("%.2f", rs.getDouble("gwa")),
-                        rs.getString("grade_status")
+                        rs.getString("student_id"),                               // index 0 — hidden
+                        rs.getString("full_name"),                                // index 1
+                        rs.getString("section"),                                  // index 2
+                        String.format("%.2f", rs.getDouble("math_grade")),        // index 3
+                        String.format("%.2f", rs.getDouble("science_grade")),     // index 4
+                        String.format("%.2f", rs.getDouble("english_grade")),     // index 5
+                        String.format("%.2f", rs.getDouble("gwa")),               // index 6
+                        rs.getString("grade_status")                              // index 7
                 });
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error loading records from database: " + e.getMessage(), 
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error loading records from database: " + ex.getMessage(),
                     "Database Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    
     @Override
     public void actionPerformed(ActionEvent e) {
 
         if (e.getSource() == btnEdit) {
-
             int selectedRow = tblGrades.getSelectedRow();
 
             if (selectedRow == -1) {
-                JOptionPane.showMessageDialog(this, "Select a student first!");
+                JOptionPane.showMessageDialog(this, "Please select a student row first!");
                 return;
             }
 
-            GradesEditorPage gep =
-                    new GradesEditorPage(this, selectedRow, model);
-
+            GradesEditorPage gep = new GradesEditorPage(this, selectedRow, model);
             gep.setVisible(true);
             setVisible(false);
         }
 
         else if (e.getSource() == btnSearch) {
+            String search = txtSearchName.getText().trim();
 
-            String search = txtSearchId.getText().trim();
+            if (search.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please enter a last name to search.");
+                return;
+            }
 
             boolean found = false;
 
             for (int i = 0; i < model.getRowCount(); i++) {
+                // Column 1 is NAME formatted as "LastName, FirstName"
+                String fullName = model.getValueAt(i, 1).toString();
+                String lastName = fullName.split(",")[0].trim();
 
-                if (model.getValueAt(i, 0).toString().equals(search)) {
-
+                if (lastName.equalsIgnoreCase(search)) {
                     tblGrades.setRowSelectionInterval(i, i);
+                    tblGrades.scrollRectToVisible(tblGrades.getCellRect(i, 1, true));
                     found = true;
                     break;
                 }
             }
 
             if (found) {
-                JOptionPane.showMessageDialog(this, "Student Found!");
+                JOptionPane.showMessageDialog(this, "Student found!");
             } else {
-                JOptionPane.showMessageDialog(this, "Student Not Found!");
+                JOptionPane.showMessageDialog(this, "Student not found!");
             }
         }
 
@@ -201,7 +209,8 @@ public class GradesManagerPage extends JFrame implements ActionListener {
             new StudentManagerPage().setVisible(true);
             dispose();
         }
-		else if (e.getSource() == btnAttendance) {
+
+        else if (e.getSource() == btnAttendance) {
             AttendanceEnglishPage aep = new AttendanceEnglishPage();
             aep.setVisible(true);
             this.setVisible(false);
