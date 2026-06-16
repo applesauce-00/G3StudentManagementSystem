@@ -10,14 +10,15 @@ import com.mycompany.g3studentmanagementsystem.databaseconnection.ConnectionStri
 public class StudentLandingPage extends JFrame implements ActionListener {
 
     private JLabel lblIcon, lblTitle;
-    private JButton btnSignOut, btnProfile, btnGrades, btnSubjects, btnReportCard;
-    private JPanel ProfilePanel, GradesPanel, SubjectsPanel, ReportCardPanel;
+    private JButton btnSignOut, btnProfile, btnGrades, btnSubjects, btnReportCard, btnAttendance;
+    private JPanel ProfilePanel, GradesPanel, SubjectsPanel, ReportCardPanel, AttendancePanel;
 
     // Table Models for Dynamic DB Updates
     private DefaultTableModel profileModel;
     private DefaultTableModel gradesModel;
     private DefaultTableModel subjectsModel;
     private DefaultTableModel reportCardModel;
+	private DefaultTableModel attendanceModel;
 
     // Tracker variable for the active user
     private String loggedInStudentId;
@@ -148,8 +149,29 @@ public class StudentLandingPage extends JFrame implements ActionListener {
         ReportCardPanel.add(new JScrollPane(reportTable), BorderLayout.CENTER);
         add(ReportCardPanel);
         ReportCardPanel.setVisible(false);
+		
+		btnAttendance = new JButton("ATTENDANCE");
+		btnAttendance.setBounds(20, 300, 180, 40); // Adjusted Y-position
+		btnAttendance.setBackground(new Color(52, 168, 235));
+		btnAttendance.setForeground(Color.WHITE);
+		btnAttendance.addActionListener(this);
+		add(btnAttendance);
 
-        // Run dynamic database queries immmediately
+		AttendancePanel = new JPanel(new BorderLayout());
+		AttendancePanel.setBounds(250, 100, 700, 500);
+
+		String[] attColumns = {"SUBJECT", "WEEK 1", "WEEK 2", "WEEK 3", "WEEK 4", "WEEK 5", "WEEK 6", "WEEK 7", "WEEK 8", "WEEK 9", "WEEK 10"};
+		attendanceModel = new DefaultTableModel(attColumns, 0) {
+			@Override public boolean isCellEditable(int row, int col) { return false; }
+		};
+
+		JTable attendanceTable = new JTable(attendanceModel);
+		attendanceTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		AttendancePanel.add(new JScrollPane(attendanceTable), BorderLayout.CENTER);
+		add(AttendancePanel);
+		AttendancePanel.setVisible(false);
+		
+		// Run dynamic database queries immmediately
         refreshStudentData();
     }
 
@@ -214,9 +236,10 @@ public class StudentLandingPage extends JFrame implements ActionListener {
 
     try (Connection con = ConnectionString.getConnection();
          PreparedStatement ps = con.prepareStatement(sql)) {
+		 ps.setString(1, loggedInStudentId);
 
-        ps.setString(1, loggedInStudentId);
 
+        
         try (ResultSet rs = ps.executeQuery()) {
 			
             // Default values if no record is found
@@ -270,11 +293,45 @@ public class StudentLandingPage extends JFrame implements ActionListener {
                 gradesModel.addRow(new Object[]{"Science", "N/A", "N/A"});
             }
 
-            // Hardcoded data
-            reportCardModel.addRow(new Object[]{"Current Year", finalAvg, overallStatus, honorStatus});
-            subjectsModel.addRow(new Object[]{"English", "Mr. Santos", "Mon 8AM"});
-            subjectsModel.addRow(new Object[]{"Math", "Ms. Olviga", "Tue 10AM"});
-            subjectsModel.addRow(new Object[]{"Science", "Mr. Nase", "Wed 1PM"});
+            // Report Card
+			reportCardModel.addRow(new Object[]{"Current Year", finalAvg, overallStatus, honorStatus});
+
+			// Load instructors from Faculty table
+			String facultySql = "SELECT subject, faculty_name FROM faculty";
+
+			try (PreparedStatement facultyPs = con.prepareStatement(facultySql);
+				 ResultSet facultyRs = facultyPs.executeQuery()) {
+
+				while (facultyRs.next()) {
+
+					String subject = facultyRs.getString("subject");
+					String instructor = facultyRs.getString("faculty_name");
+
+					// Keep schedule hardcoded
+					String schedule = "TBA";
+
+					if (subject.equalsIgnoreCase("English")) {
+						schedule = "Mon 8AM";
+					}
+					else if (subject.equalsIgnoreCase("Math")) {
+						schedule = "Tue 10AM";
+					}
+					else if (subject.equalsIgnoreCase("Science")) {
+						schedule = "Wed 1PM";
+					}
+
+					subjectsModel.addRow(new Object[]{
+						subject,
+						instructor,
+						schedule
+					});
+				}
+			}
+			try {
+				loadLiveAttendance(con);
+			} catch (SQLException e) {
+				System.err.println("Attendance Load Failed: " + e.getMessage());
+			}
 
             gradesModel.fireTableDataChanged();
             subjectsModel.fireTableDataChanged();
@@ -284,6 +341,30 @@ public class StudentLandingPage extends JFrame implements ActionListener {
         ex.printStackTrace();
     }
 }
+	
+	private void loadLiveAttendance(Connection con) throws SQLException {
+		attendanceModel.setRowCount(0);
+		String attSql = "SELECT subject, week_1, week_2, week_3, week_4, week_5, " +
+						"week_6, week_7, week_8, week_9, week_10 " +
+						"FROM student_attendance WHERE student_id = ?";
+
+		try (PreparedStatement aps = con.prepareStatement(attSql)) {
+			aps.setString(1, loggedInStudentId);
+			try (ResultSet ars = aps.executeQuery()) {
+				while (ars.next()) {
+					attendanceModel.addRow(new Object[]{
+						ars.getString("subject"),
+						ars.getString("week_1"), ars.getString("week_2"),
+						ars.getString("week_3"), ars.getString("week_4"),
+						ars.getString("week_5"), ars.getString("week_6"),
+						ars.getString("week_7"), ars.getString("week_8"),
+						ars.getString("week_9"), ars.getString("week_10")
+					});
+				}
+			}
+		}
+		attendanceModel.fireTableDataChanged();
+	}
 	
 	private String calculateStatus(String gradeStr) {
     try {
@@ -326,6 +407,7 @@ public class StudentLandingPage extends JFrame implements ActionListener {
         GradesPanel.setVisible(false);
         SubjectsPanel.setVisible(false);
         ReportCardPanel.setVisible(false);
+		AttendancePanel.setVisible(false);
 
         if (e.getSource() == btnSignOut) {
             LandingPageGUI lp = new LandingPageGUI();
@@ -344,5 +426,8 @@ public class StudentLandingPage extends JFrame implements ActionListener {
         else if (e.getSource() == btnReportCard) {
             ReportCardPanel.setVisible(true);
         }
+		else if (e.getSource() == btnAttendance) { 
+        AttendancePanel.setVisible(true);
+    }
     }
 }

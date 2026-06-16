@@ -111,30 +111,37 @@ public class StudentLogInPage extends JFrame implements ActionListener{
 
     switch (result) {
 
-        case 0: // SUCCESS
+		case 0:
 			JOptionPane.showMessageDialog(this, "Login Successful!");
 
 			StudentDataManager.loadStudentsFromDatabase();
 
-			StudentLandingPage slp = new StudentLandingPage(id); 
+			StudentLandingPage slp = new StudentLandingPage(id);
 			slp.setVisible(true);
-			this.dispose(); 
+			this.dispose();
 			break;
 
-        case 1: // ID FOUND, WRONG PASSWORD
-            JOptionPane.showMessageDialog(this,
-                    "Incorrect password for this Student ID!",
-                    "Login Failed",
-                    JOptionPane.ERROR_MESSAGE);
-            break; 
+		case 1:
+			JOptionPane.showMessageDialog(this,
+					"Incorrect password for this Student ID!",
+					"Login Failed",
+					JOptionPane.ERROR_MESSAGE);
+			break;
 
-        case 2: // ID NOT FOUND
-            JOptionPane.showMessageDialog(this,
-                    "Student ID not found!",
-                    "Login Failed",
-                    JOptionPane.ERROR_MESSAGE);
-            break;
-    }
+		case 2:
+			JOptionPane.showMessageDialog(this,
+					"Student ID not found!",
+					"Login Failed",
+					JOptionPane.ERROR_MESSAGE);
+			break;
+
+		case 3:
+			JOptionPane.showMessageDialog(this,
+					"Your Student Account is inactive.",
+					"Access Denied",
+					JOptionPane.WARNING_MESSAGE);
+			break;
+	}
 	
 		}
 	}

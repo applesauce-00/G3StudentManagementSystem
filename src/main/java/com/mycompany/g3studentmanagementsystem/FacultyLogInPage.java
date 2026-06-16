@@ -112,6 +112,7 @@ public class FacultyLogInPage extends JFrame implements ActionListener{
 
         case 0:
             JOptionPane.showMessageDialog(this, "Login Successful!");
+			String facultySubject = FacultyDataManager.getFacultySubject(id);
 
             StudentManagerPage smp = new StudentManagerPage();
             FrameSizeNavigation.navigate(this, smp);

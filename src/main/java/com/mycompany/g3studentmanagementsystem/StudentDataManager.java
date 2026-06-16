@@ -74,40 +74,59 @@ public class StudentDataManager {
     
     // VALIDATE LOGIN
     public static int validateLogin(String id, String password) {
-        String loginQuery = "SELECT * FROM students WHERE student_id=? AND password=?";
-        String idCheckQuery = "SELECT * FROM students WHERE student_id=?";
 
-        try (Connection con = ConnectionString.getConnection()) {
+    String loginQuery = "SELECT * FROM students WHERE student_id=? AND password=?";
+    String idCheckQuery = "SELECT * FROM students WHERE student_id=?";
+    String activeCheckQuery = "SELECT is_active FROM students WHERE student_id=?";
 
-            // Check if both Student ID and Password match
-            try (PreparedStatement ps = con.prepareStatement(loginQuery)) {
-                ps.setString(1, id);
-                ps.setString(2, password);
+    try (Connection con = ConnectionString.getConnection()) {
 
-                try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        return 0; // Login successful!
+        // 1. Check ID + password
+        try (PreparedStatement ps = con.prepareStatement(loginQuery)) {
+            ps.setString(1, id);
+            ps.setString(2, password);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+
+                    // 2. CHECK IF ACTIVE
+                    try (PreparedStatement ps2 = con.prepareStatement(activeCheckQuery)) {
+                        ps2.setString(1, id);
+
+                        try (ResultSet rs2 = ps2.executeQuery()) {
+                            if (rs2.next()) {
+                                int isActive = rs2.getInt("is_active");
+
+                                if (isActive == 0) {
+                                    return 3; // ❌ INACTIVE ACCOUNT
+                                }
+                            }
+                        }
                     }
+
+                    return 0; // ✅ SUCCESS
                 }
             }
-
-            // If it failed, check if the Student ID even exists
-            try (PreparedStatement ps = con.prepareStatement(idCheckQuery)) {
-                ps.setString(1, id);
-
-                try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        return 1; // Student ID exists, but password was wrong
-                    }
-                }
-            }
-            return 2; // Student ID does not exist
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return 2; 
         }
+
+        // 3. Check if ID exists
+        try (PreparedStatement ps = con.prepareStatement(idCheckQuery)) {
+            ps.setString(1, id);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return 1; // wrong password
+                }
+            }
+        }
+
+        return 2; // ID not found
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return 2;
     }
+}
     
 	// Load data from database
     public static void loadStudentsFromDatabase() {
