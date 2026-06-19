@@ -11,7 +11,7 @@ public class StudentManagerPage extends JFrame implements ActionListener {
 
     private JLabel lblIcon, lblTitle;
     private JButton btnAttendance, btnStudents, btnGrades, btnSignOut;
-    private JButton btnSearch, btnAdd, btnEdit, btnDelete, btnInactive;
+    private JButton btnSearch, btnAdd, btnEdit, btnInactive;
     private JTable tblStudent;
     private JScrollPane tableScroll;
     private JTextField txtSearchName;
@@ -85,16 +85,10 @@ public class StudentManagerPage extends JFrame implements ActionListener {
         btnEdit.setForeground(Color.WHITE);
         add(btnEdit);
 
-        btnDelete = new JButton("DELETE STUDENT");
-        btnDelete.setBounds(20, 300, 160, 40);
-        btnDelete.setBackground(new Color(52, 168, 235));
-        btnDelete.setForeground(Color.WHITE);
-        add(btnDelete);
-
         // Button to open Inactive Students list
         btnInactive = new JButton("INACTIVE LIST");
         btnInactive.setBounds(20, 360, 160, 40);
-        btnInactive.setBackground(new Color(150, 150, 150));
+        btnInactive.setBackground(new Color(224, 69, 52));
         btnInactive.setForeground(Color.WHITE);
         add(btnInactive);
 
@@ -130,7 +124,6 @@ public class StudentManagerPage extends JFrame implements ActionListener {
 
         btnAdd.addActionListener(this);
         btnEdit.addActionListener(this);
-        btnDelete.addActionListener(this);
         btnSearch.addActionListener(this);
         btnInactive.addActionListener(this);
         btnAttendance.addActionListener(this);
@@ -190,6 +183,22 @@ public class StudentManagerPage extends JFrame implements ActionListener {
         return (row != -1) ? tblStudent.getValueAt(row, 0).toString() : "";
     }
 
+    // Routes to the attendance page matching the logged-in faculty's subject 
+    private void navigateToAttendance() {
+        switch (SessionManager.subject.toUpperCase()) {
+            case "MATH":
+                FrameSizeNavigation.navigate(this, new AttendanceMathPage());
+                break;
+            case "SCIENCE":
+                FrameSizeNavigation.navigate(this, new AttendanceSciencePage());
+                break;
+            case "ENGLISH":
+            default:
+                FrameSizeNavigation.navigate(this, new AttendanceEnglishPage());
+                break;
+        }
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
 
@@ -231,7 +240,7 @@ public class StudentManagerPage extends JFrame implements ActionListener {
                 return;
             }
 
-            // Pass is_active status — all students in this table are active (1)
+            // Pass is_active status - all students in this table are active (1)
             EditStudentPage esp = new EditStudentPage(
                     s.getId(), s.getLastName(), s.getFirstName(),
                     s.getMiddleName(), s.getSection(),
@@ -242,33 +251,13 @@ public class StudentManagerPage extends JFrame implements ActionListener {
             this.setVisible(false);
         }
 
-        else if (e.getSource() == btnDelete) {
-            String lastName = txtSearchName.getText().trim();
-            Student s = null;
-
-            if (!lastName.isEmpty()) {
-                s = findByLastName(lastName);
-            } else if (tblStudent.getSelectedRow() != -1) {
-                s = StudentDataManager.findStudent(getSelectedStudentId());
-            }
-
-            if (s == null) {
-                JOptionPane.showMessageDialog(this, "Please enter a last name or select a row to delete.");
-                return;
-            }
-
-            new DeleteStudentPage(s).setVisible(true);
-            this.setVisible(false);
-        }
-
         else if (e.getSource() == btnInactive) {
             new InactiveStudentsPage().setVisible(true);
             this.setVisible(false);
         }
 
         else if (e.getSource() == btnAttendance) {
-            new AttendanceEnglishPage().setVisible(true);
-            this.setVisible(false);
+            navigateToAttendance();
         }
 
         else if (e.getSource() == btnGrades) {
@@ -277,6 +266,7 @@ public class StudentManagerPage extends JFrame implements ActionListener {
         }
 
         else if (e.getSource() == btnSignOut) {
+            SessionManager.clear(); // clear faculty session on logout
             new LandingPageGUI().setVisible(true);
             this.setVisible(false);
         }
