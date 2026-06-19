@@ -21,6 +21,9 @@ SET time_zone = "+00:00";
 -- Database: `g3studentmanagementsystem`
 --
 
+CREATE DATABASE IF NOT EXISTS g3studentmanagementsystem;
+USE g3studentmanagementsystem;
+
 -- --------------------------------------------------------
 
 --
